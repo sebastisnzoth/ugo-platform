@@ -2,13 +2,13 @@ name: Deploy UGO Platform to GitHub Pages
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
-  pages: write
-  id-token: write
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   build:
@@ -20,21 +20,30 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+          # Do not enable npm cache until package-lock.json is committed.
       - name: Install dependencies
-        run: npm install
-      - name: Build
+        run: npm install --no-audit --no-fund
+      - name: Typecheck and build
         run: npm run build
+      - name: Verify GitHub Pages output
+        run: |
+          test -s dist/index.html
+          grep -q '/ugo-platform/assets/' dist/index.html
       - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
   deploy:
+    if: github.event_name != 'pull_request'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      pages: write
+      id-token: write
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

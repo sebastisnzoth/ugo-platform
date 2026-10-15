@@ -26,3 +26,5 @@
 @media(max-width:365px){.client-page{padding-inline:15px}.client-top{padding-inline:14px}.client-area{font-size:10px}}
 
 .client-profile-form{display:grid;gap:15px;margin:22px 0}.client-profile-form label{display:grid;gap:6px;color:#365643;font-size:13px;font-weight:700}.client-profile-form input,.client-profile-form select{box-sizing:border-box;width:100%;padding:12px;border:1px solid #d8e2d9;border-radius:12px;background:white;font:inherit;font-size:14px;color:#14231b}.client-profile-form button:disabled{opacity:.6;cursor:wait}
+
+.client-order-list{padding:0;list-style:none;display:grid;gap:10px}.client-order-list li{display:grid;gap:5px;padding:15px;border:1px solid #e1ebe3;border-radius:14px}.client-order-list span,.client-order-list small{color:#65776a;font-size:12px}

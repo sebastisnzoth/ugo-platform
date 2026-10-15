@@ -4,6 +4,7 @@ import { supabase } from './lib/supabase'
 import ClientProfile from './ClientProfile'
 import ClientActivity from './ClientActivity'
 import './client-zip-design.css'
+import './client-screenshot-fidelity.css'
 
 type View = 'home'|'explore'|'request'|'active'|'activity'|'payments'|'profile'
 type Item = {id:View;label:string;icon:string}

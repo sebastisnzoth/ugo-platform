@@ -1,0 +1,58 @@
+/* Etapa 1: puente visual a ugo-flow-design-prototype (2).zip.
+   Reutiliza tokens del prototipo; la lógica de auth y Supabase existente permanece intacta. */
+:root {
+  --ugo-prototype-bg: #edf2ed;
+  --ugo-prototype-fg: #18211d;
+  --ugo-prototype-brand: #159366;
+  --ugo-prototype-surface: #ffffff;
+  --ugo-prototype-border: #d6ded9;
+  --ugo-prototype-muted: #647269;
+  --ugo-prototype-phone: #f7f9f7;
+  --ugo-prototype-action: #15241a;
+  --ugo-prototype-success-bg: #e5f5e9;
+  --ugo-prototype-success-text: #197249;
+  --ink: var(--ugo-prototype-fg);
+  --muted: var(--ugo-prototype-muted);
+  --lime: #ccebd5;
+  --paper: var(--ugo-prototype-bg);
+  --line: var(--ugo-prototype-border);
+}
+body { background: var(--ugo-prototype-bg); }
+.app-shell { max-width: 1320px; min-height: 100vh; }
+.topbar { background: transparent; border-color: var(--ugo-prototype-border); }
+.brand-mark { background: var(--ugo-prototype-brand); color: #fff; }
+.brand-dot { color: var(--ugo-prototype-brand); }
+.button-dark { background: var(--ugo-prototype-action); }
+.button-dark:hover { background: #284b34; }
+.hero-art { background: #dae7dc; }
+.sun-shape { background: #bdd8c1; }
+.person-body { background: #326348; }
+.service-section, .steps-section, footer { border-color: var(--ugo-prototype-border); }
+.service-card {
+  background: var(--ugo-prototype-surface);
+  border-color: #e7ece8;
+  border-radius: 18px;
+  box-shadow: 0 8px 26px rgb(28 53 36 / 4%);
+}
+.service-card:hover { border-color: var(--ugo-prototype-brand); box-shadow: 0 14px 32px rgb(28 53 36 / 10%); }
+.step-number { color: var(--ugo-prototype-brand); }
+.live-dot { background: var(--ugo-prototype-brand); box-shadow: 0 0 0 4px #d7f2e1; }
+.hero h1 span { color: var(--ugo-prototype-brand); }
+.pro-banner { background: #dff1e4; }
+.pro-banner .eyebrow { color: #197249; }
+.auth-modal { background: var(--ugo-prototype-surface); }
+.auth-modal input:focus-visible, .auth-modal select:focus-visible, .search-box input:focus-visible {
+  outline: 2px solid var(--ugo-prototype-brand);
+  outline-offset: 2px;
+}
+.button:focus-visible, .service-card:focus-visible, a:focus-visible {
+  outline: 3px solid var(--ugo-prototype-brand);
+  outline-offset: 3px;
+}
+@media (max-width: 600px) {
+  .hero { padding-top: 30px; }
+  .hero h1 { font-size: clamp(40px, 12vw, 58px); }
+  .hero-art { border-radius: 24px; }
+  .service-card { min-height: 158px; }
+  .auth-modal { border-radius: 24px; }
+}

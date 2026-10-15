@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabase'
 import ClientProfile from './ClientProfile'
+import ClientActivity from './ClientActivity'
 import './client-experience.css'
 
 type View = 'home' | 'services' | 'activity' | 'profile'
@@ -86,10 +87,7 @@ export default function ClientExperience() {
               </button>)}
             </div>
           </section>}
-          {view === 'activity' && <section className="client-panel"><span className="client-kicker">ACTIVIDAD</span>
-            <h1>Mis pedidos</h1><p>El historial de pedidos reales se mostrará cuando se integre y verifique la consulta autorizada de UGO TEST.</p>
-            <p className="client-muted">No mostramos servicios inventados ni estados simulados.</p>
-          </section>}
+          {view === 'activity' && <ClientActivity session={session} />}
           {view === 'profile' && <ClientProfile session={session} />}
         </>}
         {notice && <div className="client-alert" role="status"><p>{notice}</p><button onClick={() => setNotice('')} aria-label="Cerrar mensaje">×</button></div>}

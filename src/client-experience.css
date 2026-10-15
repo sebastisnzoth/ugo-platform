@@ -24,3 +24,5 @@
 .ugo-client button:focus-visible,.ugo-client input:focus-visible,.ugo-client a:focus-visible{outline:3px solid #159663;outline-offset:3px}
 @media(min-width:700px){.client-layout{border-left:1px solid #e1e9e1;border-right:1px solid #e1e9e1}}
 @media(max-width:365px){.client-page{padding-inline:15px}.client-top{padding-inline:14px}.client-area{font-size:10px}}
+
+.client-profile-form{display:grid;gap:15px;margin:22px 0}.client-profile-form label{display:grid;gap:6px;color:#365643;font-size:13px;font-weight:700}.client-profile-form input,.client-profile-form select{box-sizing:border-box;width:100%;padding:12px;border:1px solid #d8e2d9;border-radius:12px;background:white;font:inherit;font-size:14px;color:#14231b}.client-profile-form button:disabled{opacity:.6;cursor:wait}

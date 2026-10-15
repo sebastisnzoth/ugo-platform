@@ -1,0 +1,30 @@
+.ugo-client{min-height:100vh;background:#eef3ee;color:#14231b;font-family:Inter,system-ui,-apple-system,sans-serif}
+.client-layout{max-width:680px;margin:auto;min-height:100vh;background:#f8fbf8;padding-bottom:85px;box-shadow:0 0 48px #12331a0a}
+.client-top{height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 25px;border-bottom:1px solid #e4ece5;gap:10px}
+.client-logo{color:#12361f;font-size:30px;font-weight:900;text-decoration:none;letter-spacing:-2px}.client-logo span{color:#17925f}
+.client-area{font-size:12px;color:#68796b}.client-account-link{font-size:13px;font-weight:700;color:#166a43}
+.client-page{padding:28px 24px 45px}.client-welcome{padding:22px 0}.client-kicker{color:#128356;font-size:10px;font-weight:800;letter-spacing:1.8px}
+.ugo-client h1{font-size:clamp(30px,6vw,43px);line-height:1.11;letter-spacing:-1.5px;margin:12px 0}.ugo-client h1 em{font-style:normal;color:#17925f}
+.ugo-client h2{font-size:18px;letter-spacing:-.4px;margin:22px 0 14px}
+.ugo-client p{font-size:14px;line-height:1.55;color:#68796b}
+.client-search-label{display:block;margin:22px 0;font-size:12px;font-weight:700}
+.client-search-label input{margin-top:8px;box-sizing:border-box;width:100%;padding:16px;border:1px solid #d8e2d9;border-radius:15px;background:#fff;font:inherit;font-size:14px;color:#14231b}
+.client-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.client-tile{min-height:122px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;background:white;border:1px solid #e3eae4;border-radius:18px;padding:17px;text-align:left;font:inherit;font-size:15px;font-weight:700;color:#14231b;cursor:pointer}
+.client-tile>span:last-child{margin-left:auto;color:#168c5d}.client-icon{display:grid;place-items:center;font-size:24px;width:42px;height:42px;background:#e7f3eb;border-radius:12px}
+.client-tile:hover,.client-tile[aria-pressed=true]{border-color:#159663;background:#f4fcf6}
+.client-panel{margin-top:25px;padding:23px;background:white;border:1px solid #e1ebe3;border-radius:23px}
+.client-primary,.client-secondary{display:inline-block;background:#163e29;border:1px solid #163e29;color:#fff;padding:13px 18px;border-radius:12px;font:inherit;font-size:14px;font-weight:750;cursor:pointer}
+.client-secondary{background:white;color:#163e29}.client-inline-link{text-decoration:none}.client-muted{color:#758278!important;font-size:12px!important}
+.client-bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:680px;width:100%;box-sizing:border-box;display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-top:1px solid #e0e9e1;padding:10px 10px max(12px,env(safe-area-inset-bottom));z-index:5}
+.client-bottom button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;padding:7px 0;font:inherit;font-size:11px;color:#6d796e;cursor:pointer}
+.client-bottom button span{font-size:24px}.client-bottom button[aria-current=page]{color:#0b8554;font-weight:800}
+.client-alert{display:flex;align-items:start;justify-content:space-between;gap:10px;margin-top:22px;border:1px solid #b5d7bf;background:#ebf8ee;padding:12px 16px;border-radius:14px}
+.client-alert p{margin:0;color:#265039}.client-alert button{border:0;background:none;font-size:20px;cursor:pointer}
+.ugo-client button:focus-visible,.ugo-client input:focus-visible,.ugo-client a:focus-visible{outline:3px solid #159663;outline-offset:3px}
+@media(min-width:700px){.client-layout{border-left:1px solid #e1e9e1;border-right:1px solid #e1e9e1}}
+@media(max-width:365px){.client-page{padding-inline:15px}.client-top{padding-inline:14px}.client-area{font-size:10px}}
+
+.client-profile-form{display:grid;gap:15px;margin:22px 0}.client-profile-form label{display:grid;gap:6px;color:#365643;font-size:13px;font-weight:700}.client-profile-form input,.client-profile-form select{box-sizing:border-box;width:100%;padding:12px;border:1px solid #d8e2d9;border-radius:12px;background:white;font:inherit;font-size:14px;color:#14231b}.client-profile-form button:disabled{opacity:.6;cursor:wait}
+
+.client-order-list{padding:0;list-style:none;display:grid;gap:10px}.client-order-list li{display:grid;gap:5px;padding:15px;border:1px solid #e1ebe3;border-radius:14px}.client-order-list span,.client-order-list small{color:#65776a;font-size:12px}

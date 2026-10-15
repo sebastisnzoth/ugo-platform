@@ -146,6 +146,26 @@ function installFetchStub() {
   }
 }
 
+// Realtime no debe abrir sockets reales: el smoke test tiene que ser hermético
+// (mismo resultado en local, en CI y sin red).
+class SilentWebSocket {
+  static CONNECTING = 0
+  static OPEN = 1
+  static CLOSING = 2
+  static CLOSED = 3
+  readyState = 0
+  onopen = null
+  onclose = null
+  onerror = null
+  onmessage = null
+  close() {
+    this.readyState = 3
+  }
+  send() {}
+  addEventListener() {}
+  removeEventListener() {}
+}
+
 function installDom() {
   const dom = new JSDOM('<!doctype html><html><body><div id="root"></div></body></html>', {
     url: 'https://example.test/ugo-platform/?app=admin',
@@ -184,6 +204,8 @@ function installDom() {
   }
   globalThis.window = window
   globalThis.document = window.document
+  Object.defineProperty(globalThis, 'WebSocket', { value: SilentWebSocket, configurable: true, writable: true })
+  Object.defineProperty(window, 'WebSocket', { value: SilentWebSocket, configurable: true, writable: true })
   window.scrollTo = () => {}
   window.HTMLElement.prototype.scrollIntoView = () => {}
   return window

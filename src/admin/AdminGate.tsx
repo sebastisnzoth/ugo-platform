@@ -120,6 +120,11 @@ export default function AdminGate({ children }: { children: (value: AdminSession
     if (!profile || !profile.activo || !isAdminRole(profile.tipo)) {
       return { ok: false, message: 'Esa cuenta no tiene rol de administrador activo en UGO TEST.' }
     }
+    // ?app=superadmin exige explícitamente el rol superadmin, igual que la sección Super Admin del panel original.
+    const requestedSuperAdmin = new URLSearchParams(window.location.search).get('app') === 'superadmin'
+    if (requestedSuperAdmin && profile.tipo !== 'superadmin') {
+      return { ok: false, message: 'Acceso denegado: esta superficie requiere una cuenta con rol Super Admin activo.' }
+    }
     try {
       await supabaseAdmin.realtime.setAuth(session.access_token)
     } catch {

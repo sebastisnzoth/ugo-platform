@@ -15,6 +15,16 @@ for(const item of sources){
  const restored=gunzipSync(Buffer.from(encoded,'base64'))
  const checksum=createHash('sha256').update(restored).digest('hex')
  if(checksum!==item.sha)throw new Error('El ZIP original no coincide para '+item.output+'; esperado '+item.sha+' recibido '+checksum)
- writeFileSync(join(root,'src','exact',item.output),item.output.endsWith('.tsx') ? Buffer.concat([Buffer.from('// @ts-nocheck\n'),restored]) : restored)
+ let payload=restored.toString('utf8')
+ if(item.output.endsWith('.tsx')) {
+  const marker="import ClientActivityReal from './ClientActivityReal';"
+  if(!payload.includes(marker))throw new Error('Original ZIP unexpectedly changed: Activity import not found')
+  payload=payload.replace(marker,marker+"\nimport ClientRequestForm from './ClientRequestForm';")
+  const requestMarkup="<RequestView step={requestStep} setStep={setRequestStep} category={selectedCategory} setCategory={setSelectedCategory} go={go} />"
+  if(!payload.includes(requestMarkup))throw new Error('Original ZIP unexpectedly changed: request route not found')
+  payload=payload.replace(requestMarkup,"<ClientRequestForm initialCategory={selectedCategory} onBack={() => go('home')} />")
+  payload='// @ts-nocheck\n'+payload
+ }
+ writeFileSync(join(root,'src','exact',item.output),payload)
  process.stdout.write('Restaurado original '+item.output+' ('+restored.length+' bytes), SHA256 OK\n')
 }

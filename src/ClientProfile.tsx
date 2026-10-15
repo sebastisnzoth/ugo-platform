@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabase'
+import ClientSavedPlaces from './ClientSavedPlaces'
 
 type Profile = {
   telefono: string
@@ -67,6 +68,7 @@ export default function ClientProfile({ session }: { session: Session | null }) 
         <button className="client-primary" disabled={saving}>{saving?'Guardando...':'Guardar perfil'}</button>
       </form>}
     {notice && <p role="status">{notice}</p>}
+    <ClientSavedPlaces session={session} />
     <button className="client-secondary" onClick={async()=>{const {error}=await supabase.auth.signOut();if(error)setNotice(error.message)}}>Cerrar sesión</button>
   </section>
 }

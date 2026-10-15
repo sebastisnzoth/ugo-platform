@@ -3,100 +3,85 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabase'
 import ClientProfile from './ClientProfile'
 import ClientActivity from './ClientActivity'
-import './client-experience.css'
+import './client-zip-design.css'
 
-type View = 'home' | 'services' | 'activity' | 'profile'
-const services = [
-  { icon: '⚡', label: 'Electricidad' },
-  { icon: '🔧', label: 'Plomería' },
-  { icon: '🧹', label: 'Limpieza' },
-  { icon: '🎨', label: 'Pintura' },
+type View = 'home'|'explore'|'request'|'active'|'activity'|'payments'|'profile'
+type Item = {id:View;label:string;icon:string}
+const navigation:Item[]=[
+ {id:'home',label:'Inicio',icon:'⌂'},{id:'explore',label:'Explorar',icon:'⌕'},
+ {id:'active',label:'Servicio',icon:'◈'},{id:'activity',label:'Actividad',icon:'▤'},
+ {id:'payments',label:'Pagos',icon:'▣'},{id:'profile',label:'Perfil',icon:'◉'},
 ]
-
-/** Initial, non-destructive client shell ported from the UGO flow reference.
- * Only Supabase Auth operations are live. Never represent demo orders as real.
- */
-export default function ClientExperience() {
-  const [view, setView] = useState<View>('home')
-  const [session, setSession] = useState<Session | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [term, setTerm] = useState('')
-  const [selected, setSelected] = useState('')
-  const [notice, setNotice] = useState('')
-  useEffect(() => {
-    let alive = true
-    supabase.auth.getSession().then(({ data, error }) => {
-      if (!alive) return
-      setSession(data.session)
-      setLoading(false)
-      if (error) setNotice('No pudimos verificar tu sesión. Volvé a ingresar.')
-    })
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, next) => {
-      if (alive) setSession(next)
-    })
-    return () => { alive = false; listener.subscription.unsubscribe() }
-  }, [])
-
-  const matches = useMemo(() => services.filter(s => s.label.toLocaleLowerCase('es').includes(term.toLocaleLowerCase('es'))), [term])
-  function requestService(service: string) {
-    setSelected(service)
-    setNotice('La solicitud de ' + service + ' aún no está conectada al contrato de pedidos de UGO TEST. No se creó ningún pedido.')
-    setView('services')
-  }
-
-  return <div className="ugo-client">
-    <div className="client-layout">
-      <header className="client-top">
-        <a href="./" className="client-logo" aria-label="UGO - sitio principal">ugo<span>.</span></a>
-        <span className="client-area">⌖ Florianópolis · UGO TEST</span>
-        <a className="client-account-link" href="./">{session ? 'Mi cuenta' : 'Ingresar'}</a>
-      </header>
-      <main id="client-main" className="client-page">
-        {loading ? <p role="status">Verificando sesión...</p> : <>
-          {view === 'home' && <>
-            <section className="client-welcome">
-              <span className="client-kicker">SERVICIOS CERCA DE VOS</span>
-              <h1>¿Qué necesitás <em>resolver?</em></h1>
-              <p>Un pedido. Un profesional. Sin vueltas.</p>
-              <label className="client-search-label">Buscar un servicio
-                <input value={term} onChange={e => setTerm(e.target.value)} placeholder="⌕  Buscar plomero, pintor..." />
-              </label>
-            </section>
-            <section aria-label="Servicios">
-              <h2>Servicios cerca de vos</h2>
-              <div className="client-tiles">
-                {matches.map(s => <button key={s.label} className="client-tile" onClick={() => requestService(s.label)}>
-                  <span className="client-icon">{s.icon}</span><span>{s.label}</span><span aria-hidden="true">↗</span>
-                </button>)}
-              </div>
-              {matches.length === 0 && <p>No encontramos esa categoría en el catálogo visual.</p>}
-            </section>
-            <section className="client-panel">
-              <h2>Tu próximo servicio empieza acá</h2>
-              <p>El diseño ya está disponible. La creación de pedidos se habilitará cuando quede conectado y probado el contrato real de UGO TEST.</p>
-              <button className="client-primary" onClick={() => setView('services')}>Explorar servicios →</button>
-            </section>
-          </>}
-          {view === 'services' && <section>
-            <span className="client-kicker">CATEGORÍAS</span>
-            <h1>Encontrá un servicio</h1>
-            <p>Seleccioná una categoría para iniciar tu solicitud cuando esté conectada.</p>
-            <div className="client-tiles">
-              {services.map(s => <button key={s.label} className="client-tile" aria-pressed={selected === s.label} onClick={() => requestService(s.label)}>
-                <span className="client-icon">{s.icon}</span><span>{s.label}</span><span aria-hidden="true">↗</span>
-              </button>)}
-            </div>
-          </section>}
-          {view === 'activity' && <ClientActivity session={session} />}
-          {view === 'profile' && <ClientProfile session={session} />}
-        </>}
-        {notice && <div className="client-alert" role="status"><p>{notice}</p><button onClick={() => setNotice('')} aria-label="Cerrar mensaje">×</button></div>}
-      </main>
-      <nav className="client-bottom" aria-label="Navegación Cliente">
-        {([['home', '⌂', 'Inicio'], ['activity', '▤', 'Actividad'], ['services', '⌕', 'Servicios'], ['profile', '◉', 'Perfil']] as const).map(([id, icon, label]) =>
-          <button key={id} aria-current={view === id ? 'page' : undefined} onClick={() => { setView(id); setNotice('') }}><span>{icon}</span>{label}</button>
-        )}
-      </nav>
-    </div>
+const categories=[{name:'Plomería',icon:'💧',tone:'blue'},{name:'Electricidad',icon:'⚡',tone:'yellow'},
+ {name:'Limpieza',icon:'🧹',tone:'purple'},{name:'Reparaciones',icon:'🔧',tone:'orange'},
+ {name:'Climatización',icon:'❄️',tone:'cyan'},{name:'Pintura',icon:'🎨',tone:'pink'}]
+export default function ClientExperience(){
+ const [session,setSession]=useState<Session|null>(null)
+ const [loading,setLoading]=useState(true)
+ const [view,setView]=useState<View>('home')
+ const [menuOpen,setMenuOpen]=useState(false)
+ const [search,setSearch]=useState('')
+ const [category,setCategory]=useState('Plomería')
+ const [notice,setNotice]=useState('')
+ useEffect(()=>{
+  let mounted=true
+  supabase.auth.getSession().then(({data,error})=>{if(!mounted)return;setSession(data.session);setLoading(false);if(error)setNotice('No pudimos comprobar la sesión.')})
+  const {data:listener}=supabase.auth.onAuthStateChange((_event,next)=>{if(mounted)setSession(next)})
+  return()=>{mounted=false;listener.subscription.unsubscribe()}
+ },[])
+ const filtered=useMemo(()=>categories.filter(c=>c.name.toLowerCase().includes(search.toLowerCase().trim())),[search])
+ function go(next:View){setView(next);setMenuOpen(false);setNotice('');window.scrollTo({top:0,behavior:'smooth'})}
+ function startRequest(name:string){setCategory(name);go('request')}
+ const titles:Record<View,string>={home:'Inicio',explore:'Explorar servicios',request:'Nuevo servicio',active:'Mi servicio',activity:'Mis actividades',payments:'Pagos',profile:'Mi perfil'}
+ return <div className="uxugo">
+  <a className="ux-skip" href="#ux-content">Ir al contenido</a>
+  {menuOpen&&<button className="ux-backdrop" onClick={()=>setMenuOpen(false)} aria-label="Cerrar menú"/>}
+  <aside className={'ux-sidebar '+(menuOpen?'ux-sidebar-open':'')}>
+   <div className="ux-brand"><span>u<span>•</span>go</span><small>Todo resuelto.</small><button onClick={()=>setMenuOpen(false)} className="ux-close" aria-label="Cerrar menú">×</button></div>
+   <button className="ux-new" onClick={()=>startRequest('Plomería')}>＋ Nuevo servicio</button>
+   <div className="ux-nav-caption">MENÚ</div>
+   <nav className="ux-side-links" aria-label="Navegación principal">{navigation.map(item=><button key={item.id} className={view===item.id?'selected':''} onClick={()=>go(item.id)}><span aria-hidden="true">{item.icon}</span>{item.label}</button>)}</nav>
+   <div className="ux-side-bottom"><div className="ux-help">◉ <span><strong>¿Necesitás ayuda?</strong><small>Centro de soporte UGO</small></span></div>
+    <div className="ux-person"><span className="ux-person-symbol">◉</span><span><strong>{session?.user.email?.split('@')[0]||'Tu cuenta'}</strong><small>{session?'Cliente UGO':'Ingresá a UGO'}</small></span></div>
+   </div>
+  </aside>
+  <div className="ux-main">
+   <header className="ux-topbar"><button className="ux-menu" aria-label="Abrir menú" onClick={()=>setMenuOpen(true)}>☰</button>
+    <div className="ux-topcopy"><h1>{titles[view]}</h1><p>Soluciones para tu hogar, sin vueltas</p></div>
+    <div className="ux-top-right"><span className="ux-location">⌖ Florianópolis</span><span className="ux-avatar" title={session?.user.email||'Sin iniciar sesión'}>◉</span></div>
+   </header>
+   <main id="ux-content" className="ux-content">
+    {loading?<div className="ux-surface" role="status">Cargando tu cuenta...</div>:<>
+    {view==='home'&&<>
+     <section className="ux-hero"><div className="ux-hero-text"><span className="ux-pill">✦ SERVICIOS PROFESIONALES</span><h2>Tu hogar en buenas manos.</h2>
+      <p>Encontrá profesionales para lo que necesites, de forma simple y segura.</p><button onClick={()=>startRequest('Plomería')} className="ux-primary">Encontrar un profesional →</button>
+      <span className="ux-trust">✓ Un pedido. Un profesional. Sin vueltas.</span></div>
+      <div className="ux-hero-art" aria-hidden="true"><span className="ux-hero-circle">⌂</span><div className="ux-floating"><strong>✓ Servicio verificado</strong><small>UGO te acompaña</small></div></div>
+     </section>
+     <div className="ux-section-title"><div><h2>¿Qué necesitás resolver?</h2><p>Elegí la categoría ideal para vos</p></div><button className="ux-link" onClick={()=>go('explore')}>Ver todas →</button></div>
+     <div className="ux-categories">{categories.map(c=><button key={c.name} className="ux-category" onClick={()=>startRequest(c.name)}><span className={'ux-category-icon '+c.tone}>{c.icon}</span><strong>{c.name}</strong><small>Explorar →</small></button>)}</div>
+     <section className="ux-bottom-row"><div className="ux-surface"><span className="ux-subtitle">EMPEZÁ EN MINUTOS</span><h2>¿Tenés algo pendiente?</h2><p>Describí qué necesitás. UGO te ayudará a encontrar un profesional disponible cuando se habilite la creación de pedidos.</p><button className="ux-secondary" onClick={()=>startRequest('Reparaciones')}>Solicitar servicio →</button></div>
+      <div className="ux-surface ux-status"><span className="ux-subtitle">TU CUENTA</span><h2>Tu actividad</h2><p>Consultá los trabajos realmente registrados con tu usuario.</p><button className="ux-secondary" onClick={()=>go('activity')}>Ver mis pedidos →</button></div></section>
+    </>}
+    {view==='explore'&&<><div className="ux-section-title"><div><h2>Explorar profesionales</h2><p>Encontrá el servicio que buscás</p></div></div>
+      <label className="ux-search">⌕ <input placeholder="Buscar plomería, electricidad, limpieza..." value={search} onChange={e=>setSearch(e.target.value)} aria-label="Buscar categorías"/></label>
+      <div className="ux-categories">{filtered.map(c=><button key={c.name} className="ux-category" onClick={()=>startRequest(c.name)}><span className={'ux-category-icon '+c.tone}>{c.icon}</span><strong>{c.name}</strong><small>Consultar →</small></button>)}</div>
+      {filtered.length===0&&<div className="ux-surface">No se encontraron categorías visuales con ese nombre.</div>}
+      <div className="ux-surface ux-warning"><strong>Disponibilidad real de profesionales</strong><p>La búsqueda y los resultados por ubicación se mostrarán cuando se valide el matching en UGO TEST. No mostramos profesionales inventados.</p></div>
+    </>}
+    {view==='request'&&<div className="ux-request"><span className="ux-subtitle">NUEVA SOLICITUD</span><h2>Contanos qué necesitás</h2>
+     <div className="ux-stepper"><span className="current">1 Categoría</span><span>2 Detalles</span><span>3 Confirmación</span></div>
+     <div className="ux-surface"><h3>Elegí el tipo de servicio</h3><div className="ux-categories ux-request-grid">{categories.map(c=><button className={'ux-category '+(category===c.name?'ux-chosen':'')} key={c.name} onClick={()=>setCategory(c.name)}><span className={'ux-category-icon '+c.tone}>{c.icon}</span><strong>{c.name}</strong></button>)}</div>
+     <p className="ux-note">Seleccionaste <strong>{category}</strong>. El envío del pedido queda deshabilitado hasta conectar y probar el contrato de creación de servicios de UGO TEST. No se creará una solicitud ficticia.</p>
+     <div className="ux-action-row"><button className="ux-secondary" onClick={()=>go('home')}>Volver</button><button className="ux-primary" disabled title="Contrato de creación de pedidos aún sin verificar">Continuar →</button></div></div></div>}
+    {view==='activity'&&<ClientActivity session={session}/>}
+    {view==='profile'&&<ClientProfile session={session}/>}
+    {view==='active'&&<div className="ux-surface"><span className="ux-subtitle">SEGUIMIENTO</span><h2>Servicio en curso</h2><p>Revisá la actividad para ver tus pedidos reales. El mapa y el seguimiento se habilitarán tras validar GPS y los eventos de estados de UGO TEST.</p><button className="ux-secondary" onClick={()=>go('activity')}>Ver mis pedidos →</button></div>}
+    {view==='payments'&&<div className="ux-surface"><span className="ux-subtitle">MIS PAGOS</span><h2>Tu billetera UGO</h2><p>Los métodos y movimientos se conectarán al contrato de pagos existente. No mostramos saldos, cargos ni operaciones ficticias.</p><button className="ux-secondary" onClick={()=>go('profile')}>Ir a mi perfil →</button></div>}
+    </>}
+    {notice&&<div className="ux-alert" role="alert">{notice}<button onClick={()=>setNotice('')} aria-label="Cerrar alerta">×</button></div>}
+   </main>
   </div>
+  <nav className="ux-mobile-nav" aria-label="Navegación móvil">{([navigation[0],navigation[1],navigation[3],navigation[5]]).map(item=><button key={item.id} className={view===item.id?'active':''} onClick={()=>go(item.id)}><span>{item.icon}</span><small>{item.label}</small></button>)}<button className="ux-mobile-add" onClick={()=>startRequest('Plomería')} aria-label="Nuevo servicio">＋</button></nav>
+ </div>
 }

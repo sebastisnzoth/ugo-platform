@@ -1,0 +1,43 @@
+/* Screenshot parity additions: white sidebar, deep-green photographic hero,
+   six compact service cards and truthful TEST progress panel. */
+.uxugo{--canvas:#f7faf9;--green:#147e67;--green-dark:#0b6b56;font-family:Inter,"DM Sans",Arial,sans-serif}
+.ux-sidebar{width:238px;padding-top:27px;border-right:1px solid #e7eae8}
+.ux-main{margin-left:238px}
+.ux-topbar{height:75px;padding-inline:34px}
+.ux-content{max-width:1230px;padding:23px 35px 85px}
+.ux-brand>span{color:#167f69;letter-spacing:-2.8px}
+.ux-brand>span span{color:#ef6e51}
+.ux-new{height:35px;border-radius:11px;text-align:center;padding:0;background:#147d65}
+.ux-side-links button.selected{background:#e3f2ed;color:#117d66}
+.ux-hero{min-height:307px;background:linear-gradient(105deg,#0a6655 0%,#147c65 62%,#1f9373 100%);border-radius:20px;color:#fff}
+.ux-hero-text{padding:34px 39px}
+.ux-hero .ux-pill{background:#ffffff21;color:#fff;border-color:#ffffff38}
+.ux-hero h2{font-size:34px;max-width:330px;margin:20px 0 12px;line-height:1.13;letter-spacing:-1.1px}
+.ux-hero p{color:#f4fffa;font-size:12px;max-width:400px}
+.ux-hero .ux-primary{background:#fff;color:#137a64;height:39px}
+.ux-hero .ux-primary:hover{background:#effbf6}
+.ux-hero .ux-trust{color:#e7faf2;font-size:10px;margin-top:24px}
+.ux-hero-art{overflow:hidden}
+.ux-hero-ring{position:absolute;width:310px;height:310px;border:1px solid #ffffff29;border-radius:50%;right:-19px;bottom:-86px}
+.ux-ring-two{width:218px;height:218px;right:25px;bottom:-45px}
+.ux-hero-photo{position:absolute;right:16px;bottom:0;width:190px;height:220px;object-fit:cover;object-position:center 15%;border-radius:110px 110px 17px 17px;border:5px solid #ffffff4d}
+.ux-floating{right:96px;bottom:27px;padding:10px 13px;z-index:2}
+.ux-floating strong{font-size:10px}
+.ux-categories{grid-template-columns:repeat(3,minmax(0,1fr))}
+.ux-category{min-height:110px;padding:14px 16px;gap:6px}
+.ux-category-icon{height:36px;width:36px;font-size:18px}
+.ux-category strong{font-size:11px}
+.ux-category small{font-size:9px}
+.ux-bottom-single{grid-template-columns:1fr}
+.ux-progress{min-height:127px;position:relative}
+.ux-progress h2{font-size:15px}
+.ux-progress p{max-width:780px}
+.ux-progress .ux-link{margin-top:12px;padding:0}
+.ux-support{display:flex;align-items:center;gap:15px;padding:17px 19px;background:#eff6f3;border:1px solid #e3eae6;border-radius:16px;margin-top:15px}
+.ux-support>span{display:grid;place-items:center;width:42px;height:42px;background:#fff;border-radius:14px;color:#16856a;font-size:30px;flex:none}
+.ux-support>div{flex:1}
+.ux-support strong{font-size:12px}
+.ux-support p{margin:5px 0 0;color:#7b9086;font-size:10px}
+@media(min-width:1181px){.ux-hero{grid-template-columns:1.35fr .65fr}}
+@media(max-width:850px){.ux-main{margin-left:0}.ux-sidebar{width:248px}}
+@media(max-width:620px){.ux-hero{min-height:330px}.ux-hero-text{padding:24px}.ux-hero h2{font-size:28px}.ux-hero-art{opacity:.28;pointer-events:none}.ux-hero-photo{width:180px;height:205px}.ux-categories{grid-template-columns:repeat(2,minmax(0,1fr))}.ux-support{margin-bottom:12px}}

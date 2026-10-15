@@ -54,7 +54,7 @@ export default function ClientExperience(){
   <a className="ux-skip" href="#ux-content">Ir al contenido</a>
   {menuOpen&&<button className="ux-backdrop" onClick={()=>setMenuOpen(false)} aria-label="Cerrar menú"/>}
   <aside className={'ux-sidebar '+(menuOpen?'ux-sidebar-open':'')}>
-   <div className="ux-brand"><span>u<span>•</span>go</span><small>Todo resuelto.</small><button onClick={()=>setMenuOpen(false)} className="ux-close" aria-label="Cerrar menú">×</button></div>
+   <div className="ux-brand"><span>u<span>•</span>go</span><small>TODO RESUELTO.</small><button onClick={()=>setMenuOpen(false)} className="ux-close" aria-label="Cerrar menú">×</button></div>
    <button className="ux-new" onClick={()=>startRequest(firstCategory)}>＋ Nuevo servicio</button>
    <div className="ux-nav-caption">MENÚ</div>
    <nav className="ux-side-links" aria-label="Navegación principal">{navigation.map(item=><button key={item.id} className={view===item.id?'selected':''} onClick={()=>go(item.id)}><span aria-hidden="true">{item.icon}</span>{item.label}</button>)}</nav>
@@ -64,24 +64,24 @@ export default function ClientExperience(){
   </aside>
   <div className="ux-main">
    <header className="ux-topbar"><button className="ux-menu" aria-label="Abrir menú" onClick={()=>setMenuOpen(true)}>☰</button>
-    <div className="ux-topcopy"><h1>{titles[view]}</h1><p>Soluciones para tu hogar, sin vueltas</p></div>
-    <div className="ux-top-right"><span className="ux-location">⌖ Florianópolis</span><span className="ux-avatar" title={session?.user.email||'Sin iniciar sesión'}>◉</span></div>
+    <div className="ux-topcopy"><h1>{titles[view]}</h1><p>¿Qué necesitás resolver hoy?</p></div>
+    <div className="ux-top-right"><span className="ux-location">⌖ Canasvieiras, Floripa</span><span className="ux-avatar" title={session?.user.email||'Sin iniciar sesión'}>◉</span></div>
    </header>
    <main id="ux-content" className="ux-content">
     {loading?<div className="ux-surface" role="status">Cargando tu cuenta...</div>:<>
     {view==='home'&&<>
-     <section className="ux-hero"><div className="ux-hero-text"><span className="ux-pill">✦ SERVICIOS PROFESIONALES</span><h2>Tu hogar en buenas manos.</h2>
-      <p>Encontrá profesionales para lo que necesites, de forma simple y segura.</p><button onClick={()=>startRequest('Plomería')} className="ux-primary">Encontrar un profesional →</button>
-      <span className="ux-trust">✓ Un pedido. Un profesional. Sin vueltas.</span></div>
-      <div className="ux-hero-art" aria-hidden="true"><span className="ux-hero-circle">⌂</span><div className="ux-floating"><strong>✓ Servicio verificado</strong><small>UGO te acompaña</small></div></div>
+     <section className="ux-hero"><div className="ux-hero-text"><span className="ux-pill">✧ PROFESIONALES DE CONFIANZA</span><h2>Tu casa en buenas manos.</h2>
+      <p>Contanos qué necesitás. Encontramos al profesional indicado, cerca de ti y con garantía UGO.</p><button onClick={()=>startRequest('Plomería')} className="ux-primary">Solicitar un servicio →</button>
+      <span className="ux-trust">♧ Garantía UGO　◷ Respuesta rápida　✧ Expertos verificados</span></div>
+      <div className="ux-hero-art" aria-hidden="true"><span className="ux-hero-ring ux-ring-one"/><span className="ux-hero-ring ux-ring-two"/><img className="ux-hero-photo" src="https://images.pexels.com/photos/7562139/pexels-photo-7562139.jpeg?auto=compress&cs=tinysrgb&w=520" alt="" loading="lazy"/><div className="ux-floating"><strong>✓ Profesionales verificados</strong><small>UGO · servicios reales</small></div></div>
      </section>
-     <div className="ux-section-title"><div><h2>¿Qué necesitás resolver?</h2><p>Elegí la categoría ideal para vos</p></div><button className="ux-link" onClick={()=>go('explore')}>Ver todas →</button></div>
+     <div className="ux-section-title"><div><h2>¿Qué necesitás hoy?</h2><p>Soluciones para tu hogar, en un solo lugar</p></div><button className="ux-link" onClick={()=>go('explore')}>Ver todas →</button></div>
      {catalogLoading&&<p role="status">Cargando categorías de UGO TEST...</p>}
      {catalogError&&<p role="alert">{catalogError}</p>}
      {!catalogLoading&&!catalogError&&categories.length===0&&<p>No hay categorías disponibles en UGO TEST.</p>}
-     <div className="ux-categories">{categories.map(c=><button key={c.name} className="ux-category" onClick={()=>startRequest(c.name)}><span className={'ux-category-icon '+c.tone}>{c.icon}</span><strong>{c.name}</strong><small>Explorar →</small></button>)}</div>
-     <section className="ux-bottom-row"><div className="ux-surface"><span className="ux-subtitle">EMPEZÁ EN MINUTOS</span><h2>¿Tenés algo pendiente?</h2><p>Describí qué necesitás. UGO te ayudará a encontrar un profesional disponible cuando se habilite la creación de pedidos.</p><button className="ux-secondary" onClick={()=>startRequest(firstCategory)}>Solicitar servicio →</button></div>
-      <div className="ux-surface ux-status"><span className="ux-subtitle">TU CUENTA</span><h2>Tu actividad</h2><p>Consultá los trabajos realmente registrados con tu usuario.</p><button className="ux-secondary" onClick={()=>go('activity')}>Ver mis pedidos →</button></div></section>
+     <div className="ux-categories">{categories.map(c=><button key={c.name} className="ux-category" onClick={()=>startRequest(c.name)}><span className={'ux-category-icon '+c.tone}>{c.icon}</span><strong>{c.name}</strong><small>Profesionales cerca →</small></button>)}</div>
+     <section className="ux-bottom-row ux-bottom-single"><div className="ux-surface ux-progress"><span className="ux-subtitle">● TU SERVICIO</span><h2>Consultá el estado de tus solicitudes</h2><p>Revisá tus pedidos y el profesional asignado cuando UGO TEST confirme la información. No se muestran llegadas ni trabajos de demostración.</p><button className="ux-link" onClick={()=>go('activity')}>Ver detalle →</button></div></section>
+     <section className="ux-support"><span aria-hidden="true">◎</span><div><strong>¿Una urgencia?</strong><p>Soporte UGO disponible desde los canales oficiales.</p></div><button className="ux-link" onClick={()=>setNotice('El contacto con soporte está pendiente de conectar a UGO TEST.')}>Contactar →</button></section>
     </>}
     {view==='explore'&&<><div className="ux-section-title"><div><h2>Explorar profesionales</h2><p>Encontrá el servicio que buscás</p></div></div>
       <label className="ux-search">⌕ <input placeholder="Buscar plomería, electricidad, limpieza..." value={search} onChange={e=>setSearch(e.target.value)} aria-label="Buscar categorías"/></label>

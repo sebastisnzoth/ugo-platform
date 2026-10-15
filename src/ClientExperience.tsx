@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabase'
+import ClientProfile from './ClientProfile'
 import './client-experience.css'
 
 type View = 'home' | 'services' | 'activity' | 'profile'
@@ -89,18 +90,7 @@ export default function ClientExperience() {
             <h1>Mis pedidos</h1><p>El historial de pedidos reales se mostrará cuando se integre y verifique la consulta autorizada de UGO TEST.</p>
             <p className="client-muted">No mostramos servicios inventados ni estados simulados.</p>
           </section>}
-          {view === 'profile' && <section className="client-panel"><span className="client-kicker">MI PERFIL</span>
-            <h1>Tu cuenta</h1>
-            {session ? <>
-              <p>Sesión activa</p><p><strong>Email:</strong> {session.user.email ?? 'Sin email registrado'}</p>
-              <button className="client-secondary" onClick={async () => {
-                const { error } = await supabase.auth.signOut()
-                if (error) setNotice('No se pudo cerrar la sesión. Intentá nuevamente.')
-                else setNotice('Sesión cerrada correctamente.')
-              }}>Cerrar sesión</button>
-            </> : <><p>Para administrar tu perfil, ingresá con tu cuenta real de UGO.</p><a className="client-primary client-inline-link" href="./">Ingresar o crear cuenta</a></>}
-            <p className="client-muted">La edición de datos y direcciones se conectará tras verificar los contratos del perfil.</p>
-          </section>}
+          {view === 'profile' && <ClientProfile session={session} />}
         </>}
         {notice && <div className="client-alert" role="status"><p>{notice}</p><button onClick={() => setNotice('')} aria-label="Cerrar mensaje">×</button></div>}
       </main>

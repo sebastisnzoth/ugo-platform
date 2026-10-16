@@ -1,6 +1,7 @@
 import {useEffect,useState,type FormEvent} from 'react'
 import {Camera,ChevronLeft,ChevronRight,MapPin,ShieldCheck,Search} from 'lucide-react'
 import {supabase} from './supabase'
+import {createOwnedClientOrder,recoverOrNewDraftId,uploadDraftEvidence,draftStorageKey} from './clientOrderService'
 
 type Category={id:string;nombre:string;emoji:string|null}
 type Props={initialCategory:string;onBack:()=>void}
@@ -16,6 +17,10 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
  const [scheduledAt,setScheduledAt]=useState('')
  const [fileError,setFileError]=useState('')
  const [photos,setPhotos]=useState<File[]>([])
+ const [paymentMethod,setPaymentMethod]=useState<'efectivo'|'pix'>('efectivo')
+ const [busy,setBusy]=useState(false)
+ const [submitError,setSubmitError]=useState('')
+ const [created,setCreated]=useState<{id:string;estado:string;numero:number|null}|null>(null)
  useEffect(()=>{
   let active=true
   supabase.from('categorias').select('id,nombre,emoji').order('nombre').then(({data,error})=>{
@@ -29,6 +34,25 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
   })
   return()=>{active=false}
  },[initialCategory])
+ async function submitOrder(){
+  if(busy||created||!selected||!canDetails)return
+  setBusy(true);setSubmitError('')
+  try{
+   const {data:{user}}=await supabase.auth.getUser()
+   if(!user)throw new Error('Iniciá sesión para publicar la solicitud.')
+   const draftId=recoverOrNewDraftId(user.id)
+   // Upload linked evidence before creating the row; its DB trigger binds by draft id.
+   if(photos.length)await uploadDraftEvidence(user.id,draftId,photos)
+   const order=await createOwnedClientOrder({
+    categoryId:categoryId,description,address,scheduleAt:urgency==='Elegir fecha'?new Date(scheduledAt).toISOString():null,
+    paymentMethod,draftId
+   })
+   setCreated(order)
+   // Clear only after observing a persisted owned order, allowing retry recovery.
+   sessionStorage.removeItem(draftStorageKey(user.id))
+  }catch(error){setSubmitError(error instanceof Error?error.message:'No se pudo guardar el pedido en UGO TEST. Reintentá sin perder el borrador.')}
+  finally{setBusy(false)}
+ }
  const selected=categories.find(c=>c.id===categoryId)
  const scheduleValid=urgency!=='Elegir fecha'||(scheduledAt.length>0&&new Date(scheduledAt).getTime()>Date.now())
  const canDetails=description.trim().length>=10&&address.trim().length>=5&&scheduleValid
@@ -57,9 +81,10 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
     </div>
     <div className="form-actions split"><button className="outline-button" onClick={()=>setStep(1)}><ChevronLeft size={17}/> Atrás</button><button className="primary-button" disabled={!canDetails} onClick={()=>setStep(3)}>Revisar solicitud <ChevronRight size={17}/></button></div></>}
    {step===3&&<><div className="form-heading"><span><ShieldCheck size={22}/></span><div><h2>Revisá tu solicitud</h2><p>Estos son tus datos, no ejemplos.</p></div></div>
-    <div className="summary-box"><div><small>SERVICIO</small><strong>{selected?.nombre||'Sin categoría'}</strong><span>{description}</span></div><div><small>CUÁNDO</small><strong>{urgency==='Elegir fecha'?new Date(scheduledAt).toLocaleString('pt-BR'):urgency}</strong></div><div><small>DIRECCIÓN</small><strong>{address}</strong><span>{photos.length} fotos seleccionadas</span></div></div>
-    <div className="estimate"><span><ShieldCheck size={20}/></span><div><strong>No se creó ningún pedido todavía</strong><p>Falta integrar y probar la RPC de creación y el envío de fotos a UGO TEST. No se muestra un precio inventado.</p></div></div>
-    <div className="form-actions split"><button className="outline-button" onClick={()=>setStep(2)}><ChevronLeft size={17}/> Editar</button><button className="primary-button" disabled title="Pendiente validar la creación de servicios en UGO TEST">Buscar profesional <Search size={17}/></button></div></>}
+    <div className="form-grid"><label><span>Método de pago</span><select value={paymentMethod} disabled={busy||!!created} onChange={e=>setPaymentMethod(e.target.value as 'efectivo'|'pix')}><option value="efectivo">Efectivo</option><option value="pix">PIX</option></select></label></div><div className="summary-box"><div><small>SERVICIO</small><strong>{selected?.nombre||'Sin categoría'}</strong><span>{description}</span></div><div><small>CUÁNDO</small><strong>{urgency==='Elegir fecha'?new Date(scheduledAt).toLocaleString('pt-BR'):urgency}</strong></div><div><small>DIRECCIÓN</small><strong>{address}</strong><span>{photos.length} fotos seleccionadas</span></div></div>
+    <div className="estimate"><span><ShieldCheck size={20}/></span><div><strong>{created?`Pedido #${created.numero??created.id} registrado en UGO TEST`:"Confirmar pedido en UGO TEST"}</strong><p>{created?`Estado actual: ${created.estado}. Consultá Actividad para seguirlo. Matching aún no iniciado por este formulario.`:"Confirmar guarda un pedido real. No inicia la búsqueda hasta verificar ubicación y reglas de matching."}</p></div></div>
+    {submitError&&<p role="alert">{submitError}</p>}
+    <div className="form-actions split"><button className="outline-button" disabled={busy||!!created} onClick={()=>setStep(2)}><ChevronLeft size={17}/> Editar</button><button className="primary-button" disabled={busy||!!created||!canDetails} onClick={()=>void submitOrder()}>{busy?"Guardando…":created?"Pedido guardado":"Confirmar pedido"} <Search size={17}/></button></div></>}
   </section>
  </div>
 }

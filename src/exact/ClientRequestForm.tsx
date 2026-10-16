@@ -1,7 +1,7 @@
 import {useEffect,useState,type FormEvent} from 'react'
 import {Camera,ChevronLeft,ChevronRight,MapPin,ShieldCheck,Search} from 'lucide-react'
 import {supabase} from './supabase'
-import {createOwnedClientOrder,recoverOrNewDraftId,uploadDraftEvidence,draftStorageKey,dispatchOwnedClientOrder} from './clientOrderService'
+import {createOwnedClientOrder,recoverOrNewDraftId,uploadDraftEvidence,draftStorageKey,dispatchOwnedClientOrder,readOwnedOrderStatus,orderStorageKey,type OrderStatus} from './clientOrderService'
 
 type Category={id:string;nombre:string;emoji:string|null}
 type Props={initialCategory:string;onBack:()=>void}
@@ -23,6 +23,8 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
  const [dispatchMessage,setDispatchMessage]=useState('')
  const [dispatching,setDispatching]=useState(false)
  const [created,setCreated]=useState<{id:string;estado:string;numero:number|null}|null>(null)
+ const [liveStatus,setLiveStatus]=useState<OrderStatus|null>(null)
+ const [trackingError,setTrackingError]=useState('')
  useEffect(()=>{
   let active=true
   supabase.from('categorias').select('id,nombre,emoji').order('nombre').then(({data,error})=>{
@@ -36,6 +38,31 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
   })
   return()=>{active=false}
  },[initialCategory])
+ useEffect(()=>{
+  let active=true
+  const restore=async()=>{
+   const {data:{user}}=await supabase.auth.getUser()
+   if(!active||!user)return
+   const id=sessionStorage.getItem(orderStorageKey(user.id))
+   if(!id)return
+   try{const row=await readOwnedOrderStatus(id);if(active){setCreated(row);setLiveStatus(row);setStep(3)}}
+   catch{if(active)sessionStorage.removeItem(orderStorageKey(user.id))}
+  }
+  void restore()
+  return()=>{active=false}
+ },[])
+ useEffect(()=>{
+  if(!created?.id)return
+  let active=true
+  const refresh=async()=>{try{
+   const row=await readOwnedOrderStatus(created.id)
+   if(active){setLiveStatus(row);setTrackingError('')}
+  }catch(error){if(active)setTrackingError(error instanceof Error?error.message:'No se pudo actualizar el estado del pedido.')}}
+  void refresh()
+  const interval=window.setInterval(()=>void refresh(),10000)
+  const ch=supabase.channel('zip-client-service-'+created.id).on('postgres_changes',{event:'UPDATE',schema:'public',table:'servicios',filter:'id=eq.'+created.id},()=>void refresh()).subscribe()
+  return()=>{active=false;window.clearInterval(interval);void supabase.removeChannel(ch)}
+ },[created?.id])
  async function submitOrder(){
   if(busy||created||!selected||!canDetails)return
   setBusy(true);setSubmitError('')
@@ -50,15 +77,19 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
     paymentMethod,draftId
    })
    setCreated(order)
-   // Clear only after observing a persisted owned order, allowing retry recovery.
-   sessionStorage.removeItem(draftStorageKey(user.id))
+   sessionStorage.setItem(orderStorageKey(user.id),order.id)
+   // Keep the same draft until dispatch succeeds, so refresh and retry remain safe.
   }catch(error){setSubmitError(error instanceof Error?error.message:'No se pudo guardar el pedido en UGO TEST. Reintentá sin perder el borrador.')}
   finally{setBusy(false)}
  }
  async function dispatchOrder(){
   if(!created||dispatching)return
   setDispatching(true);setSubmitError('');setDispatchMessage('')
-  try{const result=await dispatchOwnedClientOrder(created.id);setDispatchMessage(result)}
+  try{const result=await dispatchOwnedClientOrder(created.id);setDispatchMessage(result)
+   const {data:{user}}=await supabase.auth.getUser()
+   if(user){sessionStorage.removeItem(draftStorageKey(user.id));sessionStorage.removeItem(orderStorageKey(user.id))}
+   const row=await readOwnedOrderStatus(created.id);setLiveStatus(row)
+  }
   catch(error){setSubmitError(error instanceof Error?error.message:'El pedido sigue guardado, pero no pudimos iniciar la búsqueda.')}
   finally{setDispatching(false)}
  }
@@ -94,6 +125,8 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
     <div className="estimate"><span><ShieldCheck size={20}/></span><div><strong>{created?`Pedido #${created.numero??created.id} registrado en UGO TEST`:"Confirmar pedido en UGO TEST"}</strong><p>{created?`Estado actual: ${created.estado}. Consultá Actividad para seguirlo. Usá «Iniciar búsqueda con mi GPS» para ofrecer el pedido a profesionales.`:"Confirmar guarda un pedido real. No inicia la búsqueda hasta verificar ubicación y reglas de matching."}</p></div></div>
     {submitError&&<p role="alert">{submitError}</p>}
     {dispatchMessage&&<p role="status">{dispatchMessage}</p>}
+    {created&&<p role="status">Estado actual UGO TEST: <strong>{liveStatus?.estado||created.estado}</strong>{liveStatus?.proveedor_id?' · Proveedor asignado':' · Sin proveedor asignado'}</p>}
+    {trackingError&&<p role="alert">{trackingError}</p>}
     {created&&<div className="form-actions"><button className="primary-button" disabled={dispatching||!!dispatchMessage} onClick={()=>void dispatchOrder()}>{dispatching?'Comprobando GPS y buscando…':'Iniciar búsqueda con mi GPS'}</button><small>Solo se envía tras obtener GPS reciente y guardar la ubicación en UGO TEST.</small></div>}
     <div className="form-actions split"><button className="outline-button" disabled={busy||!!created} onClick={()=>setStep(2)}><ChevronLeft size={17}/> Editar</button><button className="primary-button" disabled={busy||!!created||!canDetails} onClick={()=>void submitOrder()}>{busy?"Guardando…":created?"Pedido guardado":"Confirmar pedido"} <Search size={17}/></button></div></>}
   </section>

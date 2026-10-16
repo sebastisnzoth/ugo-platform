@@ -8,14 +8,15 @@ type Props={initialCategory:string;onBack:()=>void}
 export default function ClientRequestForm({initialCategory,onBack}:Props){
  const [categories,setCategories]=useState<Category[]>([])
  const [authUser,setAuthUser]=useState<string|null>(null)
+ const [authLoading,setAuthLoading]=useState(true)
  const [email,setEmail]=useState('')
  const [password,setPassword]=useState('')
  const [authBusy,setAuthBusy]=useState(false)
  const [authMessage,setAuthMessage]=useState('')
  useEffect(()=>{
   let active=true
-  void supabase.auth.getUser().then(({data})=>{if(active)setAuthUser(data.user?.email||null)})
-  const {data:listener}=supabase.auth.onAuthStateChange((_event,session)=>setAuthUser(session?.user.email||null))
+  void supabase.auth.getUser().then(({data})=>{if(active){setAuthUser(data.user?.email||null);setAuthLoading(false)}}).catch(()=>{if(active)setAuthLoading(false)})
+  const {data:listener}=supabase.auth.onAuthStateChange((_event,session)=>{setAuthUser(session?.user.email||null);setAuthLoading(false)})
   return()=>{active=false;listener.subscription.unsubscribe()}
  },[])
  async function login(event:FormEvent<HTMLFormElement>){
@@ -63,6 +64,7 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
  },[initialCategory])
  useEffect(()=>{
   let active=true
+  if(!authUser)return
   const restore=async()=>{
    const {data:{user}}=await supabase.auth.getUser()
    if(!active||!user)return
@@ -73,7 +75,7 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
   }
   void restore()
   return()=>{active=false}
- },[])
+ },[authUser])
  useEffect(()=>{
   if(!created?.id)return
   let active=true
@@ -132,8 +134,8 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
   setPhotos(files.filter(f=>f.type.startsWith('image/')&&f.size<=5*1024*1024).slice(0,5))
  }
  return <div className="request-wrap">
-  {!authUser?<section className="request-card"><div className="form-heading"><span><ShieldCheck size={22}/></span><div><h2>Ingresá a UGO TEST</h2><p>Para crear pedidos reales necesitás iniciar sesión.</p></div></div><form onSubmit={e=>void login(e)} className="form-grid"><label className="full"><span>Email</span><input type="email" required autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)}/></label><label className="full"><span>Contraseña</span><input type="password" required minLength={6} autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)}/></label><div className="form-actions"><button type="submit" className="primary-button" disabled={authBusy}> {authBusy?"Conectando…":"Ingresar y continuar"} </button><button type="button" className="outline-button" disabled={authBusy||!email.trim()||password.length<6} onClick={()=>void register()}>Crear cuenta Cliente</button></div></form>{authMessage&&<p role="status">{authMessage}</p>}</section>:<p role="status">Conectado a UGO TEST: {authUser} <button type="button" className="outline-button" onClick={()=>void supabase.auth.signOut()}>Salir</button></p>}
-  {authUser&&<>
+  {authLoading?<p role="status">Verificando sesión con UGO TEST…</p>:!authUser?<section className="request-card"><div className="form-heading"><span><ShieldCheck size={22}/></span><div><h2>Ingresá a UGO TEST</h2><p>Para crear pedidos reales necesitás iniciar sesión.</p></div></div><form onSubmit={e=>void login(e)} className="form-grid"><label className="full"><span>Email</span><input type="email" required autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)}/></label><label className="full"><span>Contraseña</span><input type="password" required minLength={6} autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)}/></label><div className="form-actions"><button type="submit" className="primary-button" disabled={authBusy}> {authBusy?"Conectando…":"Ingresar y continuar"} </button><button type="button" className="outline-button" disabled={authBusy||!email.trim()||password.length<6} onClick={()=>void register()}>Crear cuenta Cliente</button></div></form>{authMessage&&<p role="status">{authMessage}</p>}</section>:<p role="status">Conectado a UGO TEST: {authUser} <button type="button" className="outline-button" onClick={()=>void supabase.auth.signOut()}>Salir</button></p>}
+  {!authLoading&&authUser&&<>
   <div className="stepper">{['Servicio','Detalles','Confirmación'].map((label,i)=><div key={label} className={step>=i+1?'active':''}><span>{i+1}</span><b>{label}</b>{i<2&&<i/>}</div>)}</div>
   <section className="request-card">
    {step===1&&<><div className="form-heading"><span><Search size={22}/></span><div><h2>¿Qué servicio necesitás?</h2><p>Categorías disponibles en UGO TEST.</p></div></div>

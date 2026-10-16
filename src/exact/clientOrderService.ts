@@ -10,7 +10,17 @@ export type ClientOrderInput={
 }
 export type CreatedOrder={id:string;estado:string;numero:number|null}
 const DRAFT_PREFIX='ugo:client:request-draft:'
+const ORDER_PREFIX='ugo:client:submitted-order:'
 export function draftStorageKey(userId:string){return DRAFT_PREFIX+userId}
+export function orderStorageKey(userId:string){return ORDER_PREFIX+userId}
+export type OrderStatus={id:string;numero:number|null;estado:string;proveedor_id:string|null}
+export async function readOwnedOrderStatus(id:string):Promise<OrderStatus>{
+ const {data:{user},error:authError}=await supabase.auth.getUser()
+ if(authError||!user)throw new Error('Sesión de Cliente no disponible.')
+ const {data,error}=await supabase.from('servicios').select('id,numero,estado,proveedor_id').eq('id',id).eq('cliente_id',user.id).single()
+ if(error||!data)throw new Error('No se pudo consultar el estado del pedido.')
+ return data as OrderStatus
+}
 export function recoverOrNewDraftId(userId:string){
  const key=draftStorageKey(userId)
  const old=sessionStorage.getItem(key)

@@ -72,3 +72,29 @@ export async function uploadDraftEvidence(userId:string,draftId:string,files:Fil
   if(rowError){await supabase.storage.from('request-evidence').remove([path]);throw rowError}
  }
 }
+
+export async function dispatchOwnedClientOrder(serviceId:string):Promise<string>{
+ const {data:{user},error:authError}=await supabase.auth.getUser()
+ if(authError||!user)throw new Error('Tu sesión expiró. Iniciá sesión otra vez.')
+ const {data:row,error:readError}=await supabase.from('servicios')
+  .select('id,estado,cliente_id,metadata,proveedor_id').eq('id',serviceId).eq('cliente_id',user.id).single()
+ if(readError||!row)throw new Error('No encontramos el pedido en tu cuenta.')
+ if(row.proveedor_id)return 'El profesional ya está asignado.'
+ if(!['buscando','ofrecido'].includes(String(row.estado)))throw new Error('Este pedido no admite iniciar búsqueda en su estado actual.')
+ const method=String((row.metadata as Record<string,unknown>|null)?.payment_method||'')
+ if(!['efectivo','pix'].includes(method))throw new Error('Elegí una forma de pago válida.')
+ if(!navigator.geolocation)throw new Error('El GPS no está disponible en este dispositivo.')
+ const position=await new Promise<GeolocationPosition>((resolve,reject)=>
+  navigator.geolocation.getCurrentPosition(resolve,reject,{enableHighAccuracy:true,timeout:15000,maximumAge:0}))
+ if(!Number.isFinite(position.coords.latitude)||!Number.isFinite(position.coords.longitude)||
+    position.coords.latitude===0&&position.coords.longitude===0||
+    position.coords.accuracy>200||Date.now()-position.timestamp>30000)
+   throw new Error('No pudimos confirmar un GPS preciso y reciente. Acercate a una ventana o habilitá ubicación exacta.')
+ const {error:locationError}=await supabase.rpc('guardar_ubicacion_servicio_cliente',{
+  p_servicio_id:serviceId,p_lat:position.coords.latitude,p_lng:position.coords.longitude
+ })
+ if(locationError)throw new Error('El pedido quedó guardado, pero falló el registro GPS: '+locationError.message)
+ const {error:matchingError}=await supabase.rpc('iniciar_matching',{p_servicio_id:serviceId})
+ if(matchingError)throw new Error('El pedido quedó guardado, pero no se pudo iniciar el matching: '+matchingError.message)
+ return 'La búsqueda se inició en UGO TEST. Consultá Actividad para seguir el pedido.'
+}

@@ -7,6 +7,29 @@ type Category={id:string;nombre:string;emoji:string|null}
 type Props={initialCategory:string;onBack:()=>void}
 export default function ClientRequestForm({initialCategory,onBack}:Props){
  const [categories,setCategories]=useState<Category[]>([])
+ const [authUser,setAuthUser]=useState<string|null>(null)
+ const [email,setEmail]=useState('')
+ const [password,setPassword]=useState('')
+ const [authBusy,setAuthBusy]=useState(false)
+ const [authMessage,setAuthMessage]=useState('')
+ useEffect(()=>{
+  let active=true
+  void supabase.auth.getUser().then(({data})=>{if(active)setAuthUser(data.user?.email||null)})
+  const {data:listener}=supabase.auth.onAuthStateChange((_event,session)=>setAuthUser(session?.user.email||null))
+  return()=>{active=false;listener.subscription.unsubscribe()}
+ },[])
+ async function login(event:FormEvent<HTMLFormElement>){
+  event.preventDefault();setAuthBusy(true);setAuthMessage('')
+  const {error}=await supabase.auth.signInWithPassword({email:email.trim(),password})
+  setAuthBusy(false)
+  if(error)setAuthMessage('No pudimos iniciar sesión: '+error.message)
+  else {setAuthMessage('Sesión conectada con UGO TEST. Ya podés continuar con el pedido.');setPassword('')}
+ }
+ async function register(){
+  setAuthBusy(true);setAuthMessage('')
+  const {error}=await supabase.auth.signUp({email:email.trim(),password,options:{data:{tipo:'cliente',role:'cliente'}}})
+  setAuthBusy(false);setAuthMessage(error?error.message:'Revisá tu email si UGO TEST solicita confirmar la cuenta.')
+ }
  const [catalogError,setCatalogError]=useState('')
  const [catalogLoading,setCatalogLoading]=useState(true)
  const [step,setStep]=useState(1)
@@ -109,6 +132,8 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
   setPhotos(files.filter(f=>f.type.startsWith('image/')&&f.size<=5*1024*1024).slice(0,5))
  }
  return <div className="request-wrap">
+  {!authUser?<section className="request-card"><div className="form-heading"><span><ShieldCheck size={22}/></span><div><h2>Ingresá a UGO TEST</h2><p>Para crear pedidos reales necesitás iniciar sesión.</p></div></div><form onSubmit={e=>void login(e)} className="form-grid"><label className="full"><span>Email</span><input type="email" required autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)}/></label><label className="full"><span>Contraseña</span><input type="password" required minLength={6} autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)}/></label><div className="form-actions"><button type="submit" className="primary-button" disabled={authBusy}> {authBusy?"Conectando…":"Ingresar y continuar"} </button><button type="button" className="outline-button" disabled={authBusy||!email.trim()||password.length<6} onClick={()=>void register()}>Crear cuenta Cliente</button></div></form>{authMessage&&<p role="status">{authMessage}</p>}</section>:<p role="status">Conectado a UGO TEST: {authUser} <button type="button" className="outline-button" onClick={()=>void supabase.auth.signOut()}>Salir</button></p>}
+  {authUser&&<>
   <div className="stepper">{['Servicio','Detalles','Confirmación'].map((label,i)=><div key={label} className={step>=i+1?'active':''}><span>{i+1}</span><b>{label}</b>{i<2&&<i/>}</div>)}</div>
   <section className="request-card">
    {step===1&&<><div className="form-heading"><span><Search size={22}/></span><div><h2>¿Qué servicio necesitás?</h2><p>Categorías disponibles en UGO TEST.</p></div></div>
@@ -136,6 +161,6 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
     {created&&<button type="button" className="outline-button" onClick={()=>void beginAnotherOrder()}>Crear otro pedido independiente</button>}
     {created&&<div className="form-actions"><button className="primary-button" disabled={dispatching||!!dispatchMessage} onClick={()=>void dispatchOrder()}>{dispatching?'Comprobando GPS y buscando…':'Iniciar búsqueda con mi GPS'}</button><small>Solo se envía tras obtener GPS reciente y guardar la ubicación en UGO TEST.</small></div>}
     <div className="form-actions split"><button className="outline-button" disabled={busy||!!created} onClick={()=>setStep(2)}><ChevronLeft size={17}/> Editar</button><button className="primary-button" disabled={busy||!!created||!canDetails} onClick={()=>void submitOrder()}>{busy?"Guardando…":created?"Pedido guardado":"Confirmar pedido"} <Search size={17}/></button></div></>}
-  </section>
+  </section></>}
  </div>
 }

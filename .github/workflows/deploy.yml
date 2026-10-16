@@ -1,4 +1,5 @@
 name: Deploy UGO Platform to GitHub Pages
+# Preview PR #9: refresh authenticated client request flow from feature branch.
 on:
   push:
     branches: [main]

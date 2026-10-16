@@ -1,0 +1,352 @@
+/* UGO · Pantalla de acceso del panel administrativo */
+
+.ad-gate {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  background: #f1f5f3;
+  font-family: 'DM Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  color: #101a17;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ad-gate *,
+.ad-gate *::before,
+.ad-gate *::after {
+  box-sizing: border-box;
+}
+
+.ad-gate button,
+.ad-gate input {
+  font: inherit;
+  color: inherit;
+}
+
+.ad-gate h1,
+.ad-gate h2 {
+  font-family: 'Manrope', 'DM Sans', sans-serif;
+  letter-spacing: -1px;
+  margin: 0;
+}
+
+.ad-gate p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.ad-gate code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11.5px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 1px 5px;
+}
+
+.ad-gate :focus-visible {
+  outline: 3px solid rgba(215, 243, 106, 0.55);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------- marca --------------------------------- */
+
+.ad-gate-brand {
+  position: relative;
+  padding: 54px 56px 46px;
+  background: radial-gradient(120% 90% at 12% 8%, #17453a 0%, #0a1614 58%, #081210 100%);
+  color: rgba(255, 255, 255, 0.78);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  overflow: hidden;
+}
+
+.ad-gate-brand::after {
+  content: '';
+  position: absolute;
+  width: 460px;
+  height: 460px;
+  right: -160px;
+  bottom: -190px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(215, 243, 106, 0.22) 0%, rgba(215, 243, 106, 0) 68%);
+}
+
+.ad-gate-brand-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.ad-gate-logo {
+  font-family: 'Manrope', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -2px;
+  color: #fff;
+}
+
+.ad-gate-logo span {
+  color: #d7f36a;
+}
+
+.ad-env-badge {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 7px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(215, 243, 106, 0.3);
+  background: rgba(215, 243, 106, 0.1);
+  color: #e6f79e;
+}
+
+.ad-gate-brand h1 {
+  font-size: clamp(30px, 3.4vw, 46px);
+  line-height: 1.08;
+  color: #fff;
+  position: relative;
+  z-index: 1;
+}
+
+.ad-gate-brand h1 em {
+  font-style: normal;
+  color: #d7f36a;
+}
+
+.ad-gate-brand > p {
+  max-width: 520px;
+  font-size: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.ad-gate-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.ad-gate-list li {
+  display: grid;
+  gap: 3px;
+  padding: 13px 15px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ad-gate-list strong {
+  font-size: 12.5px;
+  color: #fff;
+}
+
+.ad-gate-list span {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.ad-gate-foot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.5);
+  position: relative;
+  z-index: 1;
+}
+
+.ad-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d7f36a;
+  box-shadow: 0 0 0 5px rgba(215, 243, 106, 0.14);
+}
+
+/* ---------------------------------- tarjeta -------------------------------- */
+
+.ad-gate-card {
+  display: grid;
+  place-items: center;
+  padding: 42px 34px;
+}
+
+.ad-gate-form,
+.ad-gate-block {
+  width: min(430px, 100%);
+  background: #fff;
+  border: 1px solid #e2e9e5;
+  border-radius: 22px;
+  padding: 32px 30px;
+  display: grid;
+  gap: 14px;
+  box-shadow: 0 24px 60px rgba(11, 32, 24, 0.08);
+}
+
+.ad-gate-block {
+  justify-items: center;
+  text-align: center;
+}
+
+.ad-gate-kicker {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #0f8a5c;
+}
+
+.ad-gate-form h2 {
+  font-size: 25px;
+}
+
+.ad-gate-help {
+  font-size: 12.5px;
+  color: #68786f;
+}
+
+.ad-gate-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ad-gate-form input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #e2e9e5;
+  border-radius: 12px;
+  background: #fbfdfc;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ad-gate-form input:focus {
+  background: #fff;
+  border-color: #0f8a5c;
+  outline: 2px solid rgba(15, 138, 92, 0.28);
+  outline-offset: 1px;
+}
+
+.ad-gate-error,
+.ad-gate-notice {
+  font-size: 12.5px;
+  border-radius: 11px;
+  padding: 10px 12px;
+}
+
+.ad-gate-error {
+  background: #fdeceb;
+  border: 1px solid #f6d6d1;
+  color: #9c3323;
+}
+
+.ad-gate-notice {
+  background: #e6f5ee;
+  border: 1px solid #cbe8db;
+  color: #0b6a47;
+}
+
+.ad-gate-link {
+  border: 0;
+  background: transparent;
+  color: #0f8a5c;
+  font-size: 12.5px;
+  font-weight: 800;
+  justify-self: start;
+}
+
+.ad-gate-note {
+  font-size: 11px;
+  color: #93a29a;
+  border-top: 1px solid #eef2f0;
+  padding-top: 12px;
+}
+
+.ad-spinner {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 3px solid #e2e9e5;
+  border-top-color: #0f8a5c;
+  animation: ad-gate-spin 0.9s linear infinite;
+}
+
+@keyframes ad-gate-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ------------------------------- componentes ------------------------------- */
+
+.ad-gate .ad-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ad-gate .ad-button-primary {
+  background: #101a17;
+  color: #fff;
+}
+
+.ad-gate .ad-button-primary:hover:not(:disabled) {
+  background: #0b7350;
+}
+
+.ad-gate .ad-button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.ad-gate .ad-button-block {
+  width: 100%;
+}
+
+@media (max-width: 980px) {
+  .ad-gate {
+    grid-template-columns: 1fr;
+  }
+  .ad-gate-brand {
+    padding: 34px 26px 30px;
+    gap: 16px;
+  }
+  .ad-gate-list {
+    display: none;
+  }
+  .ad-gate-card {
+    padding: 26px 18px 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ad-gate * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+.ad-gate-inline-link {
+  color: #0f8a5c;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

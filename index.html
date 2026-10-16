@@ -1,2 +1,13 @@
 <!doctype html>
-<html lang="es"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="theme-color" content="#111827"/><meta name="description" content="UGO — servicios profesionales cerca de vos"/><title>UGO — Servicios</title></head><body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>
+<html lang="es"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="theme-color" content="#111827"/><meta name="description" content="UGO — servicios profesionales cerca de vos"/><title>UGO — Servicios</title>
+<style>
+  #root{min-height:100vh}
+  .ugo-boot-shell{min-height:100vh;display:grid;place-items:center;background:#f1f5f3;font-family:'DM Sans',system-ui,-apple-system,sans-serif;color:#101a17}
+  .ugo-boot-shell div{display:grid;justify-items:center;gap:14px}
+  .ugo-boot-shell strong{font-family:Manrope,'DM Sans',sans-serif;font-size:30px;letter-spacing:-1.8px;font-weight:800}
+  .ugo-boot-shell strong em{font-style:normal;color:#d7f36a;background:#101a17;border-radius:9px;padding:0 8px}
+  .ugo-boot-shell small{font-size:12px;color:#68786f;letter-spacing:.06em;text-transform:uppercase}
+  .ugo-boot-spinner{width:26px;height:26px;border-radius:50%;border:3px solid #dbe4df;border-top-color:#0f8a5c;animation:ugo-boot-spin .9s linear infinite}
+  @keyframes ugo-boot-spin{to{transform:rotate(360deg)}}
+</style>
+</head><body><div id="root"><div class="ugo-boot-shell"><div><strong>u<em>go</em>.</strong><span class="ugo-boot-spinner"></span><small>Cargando UGO…</small></div></div></div><script type="module" src="/src/main.tsx"></script></body></html>

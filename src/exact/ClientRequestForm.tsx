@@ -27,7 +27,7 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
  const [trackingError,setTrackingError]=useState('')
  useEffect(()=>{
   let active=true
-  supabase.from('categorias').select('id,nombre,emoji').order('nombre').then(({data,error})=>{
+  supabase.from('categorias').select('id,nombre,emoji').eq('activa',true).order('nombre').then(({data,error})=>{
    if(!active)return
    setCatalogLoading(false)
    if(error){setCatalogError('No pudimos cargar categorías de UGO TEST: '+error.message);return}
@@ -87,7 +87,7 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
   setDispatching(true);setSubmitError('');setDispatchMessage('')
   try{const result=await dispatchOwnedClientOrder(created.id);setDispatchMessage(result)
    const {data:{user}}=await supabase.auth.getUser()
-   if(user){sessionStorage.removeItem(draftStorageKey(user.id));sessionStorage.removeItem(orderStorageKey(user.id))}
+   if(user){sessionStorage.removeItem(draftStorageKey(user.id))}
    const row=await readOwnedOrderStatus(created.id);setLiveStatus(row)
   }
   catch(error){setSubmitError(error instanceof Error?error.message:'El pedido sigue guardado, pero no pudimos iniciar la búsqueda.')}

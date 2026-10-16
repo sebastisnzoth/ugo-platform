@@ -25,6 +25,24 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Typecheck and build
         run: npm run build
+      - name: Checkout UGO Cliente PR #9 for isolated Pages preview
+        if: github.event_name != 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          ref: feat/client-exact-zip-source-20261015
+          path: preview-source
+          persist-credentials: false
+      - name: Build PR #9 preview under /preview/pr-9/
+        if: github.event_name != 'pull_request'
+        working-directory: preview-source
+        run: |
+          npm install --no-audit --no-fund
+          npm run prebuild
+          npx tsc -b
+          npx vite build --base=/ugo-platform/preview/pr-9/ --outDir ../dist/preview/pr-9
+          test -s ../dist/preview/pr-9/index.html
+          grep -q '/ugo-platform/preview/pr-9/assets/' ../dist/preview/pr-9/index.html
+          printf '<!doctype html><html lang="es"><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=./?app=client"><title>UGO Cliente PR #9</title></head><body><a href="./?app=client">Abrir UGO Cliente PR #9</a></body></html>' > ../dist/preview/pr-9/go.html
       - name: Verify GitHub Pages output
         run: |
           test -s dist/index.html

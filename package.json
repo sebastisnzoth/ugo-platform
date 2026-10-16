@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "smoke:admin": "node scripts/smoke-admin-ui.mjs"
+    "smoke:admin": "node scripts/smoke-admin-ui.mjs && node scripts/smoke-admin-ui.mjs --bridge"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.1",

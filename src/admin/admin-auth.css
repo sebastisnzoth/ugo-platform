@@ -343,3 +343,10 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+.ad-gate-inline-link {
+  color: #0f8a5c;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

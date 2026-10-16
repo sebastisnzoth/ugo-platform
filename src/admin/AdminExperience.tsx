@@ -122,6 +122,16 @@ export default function AdminExperience({ session }: { session: AdminSession }) 
     void reloadMetrics()
   }, [reloadMetrics, refreshToken])
 
+  // La barra de direcciones refleja siempre la sección abierta: la URL se puede compartir.
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    const app = url.searchParams.get('app') === 'superadmin' && session.role === 'superadmin' ? 'superadmin' : 'admin'
+    if (url.searchParams.get('app') === app && url.searchParams.get('section') === section) return
+    url.searchParams.set('app', app)
+    url.searchParams.set('section', section)
+    window.history.replaceState({}, '', url.toString())
+  }, [section, session.role])
+
   const realtime = useAdminRealtime(REALTIME_TABLES, () => {
     setRefreshToken((value) => value + 1)
     setLastRefresh(new Date())

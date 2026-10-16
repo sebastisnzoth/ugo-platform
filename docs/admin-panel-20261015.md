@@ -37,6 +37,19 @@ simula: si la RPC no está expuesta o falla, el panel muestra el motivo y no mar
 
 ## 2. Acceso
 
+### Cómo llegar al panel
+
+| Camino | Detalle |
+| --- | --- |
+| URL directa | `?app=admin` (o `?app=superadmin` para el rol superadmin) |
+| Web pública, cuenta admin | Al iniciar sesión con una cuenta administrativa aparece el botón **Panel admin ↗** en la barra superior |
+| Web pública, siempre | Enlace **Acceso admin ↗** en el pie del sitio |
+| Sesión compartida | Si ya iniciaste sesión en la web/cliente con una cuenta admin, el panel **reutiliza esa sesión** (`src/lib/sessionBridge.ts`) y entra directo, sin pedir login otra vez |
+
+La barra de direcciones se normaliza a `?app=admin&section=<sección>` para poder compartir la vista.
+
+### Validación de rol
+
 1. Abrir `?app=admin` (o `?app=superadmin`).
 2. Ingresar con el email (o usuario corto, que se resuelve como `usuario@example.com`) y contraseña de UGO TEST.
 3. El panel valida el rol contra `usuarios`: `tipo` ∈ {`admin`, `superadmin`, `arbitro`} y `activo = true`.

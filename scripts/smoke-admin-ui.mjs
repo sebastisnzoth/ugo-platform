@@ -17,6 +17,22 @@ const SUPABASE_HOST = 'tmossnqfwfwjrtzwcbmm.supabase.co'
 const now = Date.now()
 const iso = (minutesAgo) => new Date(now - minutesAgo * 60000).toISOString()
 
+const b64url = (value) => Buffer.from(JSON.stringify(value)).toString('base64url')
+
+// JWT con forma válida: supabase-js decodifica el token localmente en setSession.
+function fakeJwt(minutes = 60) {
+  const header = b64url({ alg: 'HS256', typ: 'JWT' })
+  const payload = b64url({
+    sub: '11111111-1111-4111-8111-111111111111',
+    role: 'authenticated',
+    aud: 'authenticated',
+    email: 'admin@ugo.test',
+    exp: Math.floor(now / 1000) + minutes * 60,
+    iat: Math.floor(now / 1000),
+  })
+  return `${header}.${payload}.firma-de-prueba`
+}
+
 const serviceRow = (id, estado, overrides = {}) => ({
   id,
   numero: Number(id.replace(/\D/g, '')) || 1,
@@ -103,6 +119,42 @@ function rowsFor(table) {
   return Array.isArray(rows) ? rows : []
 }
 
+const RESERVED = new Set(['select', 'order', 'limit', 'offset', 'apikey', 'columns', 'on_conflict'])
+
+function cell(value) {
+  if (value === null || value === undefined) return 'null'
+  return String(value)
+}
+
+// Filtros PostgREST mínimos para que el stub respete eq/in/is/gt/lt/ilike.
+function applyFilters(rows, params) {
+  let out = rows
+  for (const [key, raw] of params.entries()) {
+    if (RESERVED.has(key) || key.startsWith('select')) continue
+    if (raw.startsWith('eq.')) out = out.filter((row) => cell(row[key]) === raw.slice(3))
+    else if (raw.startsWith('neq.')) out = out.filter((row) => cell(row[key]) !== raw.slice(4))
+    else if (raw.startsWith('in.(')) {
+      const list = raw.slice(4, -1).split(',').map((item) => item.trim().replace(/^"|"$/g, ''))
+      out = out.filter((row) => list.includes(cell(row[key])))
+    } else if (raw.startsWith('is.')) {
+      const target = raw.slice(3)
+      out = out.filter((row) => (target === 'null' ? row[key] === null || row[key] === undefined : cell(row[key]) === target))
+    } else if (raw.startsWith('gte.')) {
+      const bound = raw.slice(4)
+      out = out.filter((row) => new Date(cell(row[key])) >= new Date(bound) || Number(row[key]) >= Number(bound))
+    } else if (raw.startsWith('gt.')) {
+      out = out.filter((row) => Number(row[key]) > Number(raw.slice(3)))
+    } else if (raw.startsWith('lt.')) {
+      const bound = raw.slice(3)
+      out = out.filter((row) => new Date(cell(row[key])) < new Date(bound) || Number(row[key]) < Number(bound))
+    } else if (raw.startsWith('ilike.')) {
+      const needle = raw.slice(6).replace(/%/g, '').toLowerCase()
+      out = out.filter((row) => String(row[key] || '').toLowerCase().includes(needle))
+    }
+  }
+  return out
+}
+
 function installFetchStub() {
   const original = globalThis.fetch
   globalThis.fetch = async (input, init = {}) => {
@@ -127,14 +179,15 @@ function installFetchStub() {
 
     if (parsed.pathname.startsWith('/rest/v1/')) {
       const table = parsed.pathname.replace('/rest/v1/', '').split('/')[0]
-      const rows = rowsFor(table)
-      const wantsObject = String(init.headers && (init.headers.accept || init.headers.Accept) || '').includes('pgrst.object')
-      if (String(parsed.searchParams.get('select') || '').includes('head')) {
-        headers.set('content-range', `0-0/${rows.length}`)
-        return new Response(null, { status: 200, headers })
-      }
-      headers.set('content-range', `0-${Math.max(rows.length - 1, 0)}/${rows.length}`)
-      const body = method === 'GET' ? (wantsObject ? rows[0] || null : rows) : rows[0] || null
+      const rows = applyFilters(rowsFor(table), parsed.searchParams)
+      const requestHeaders = new Headers(init.headers || {})
+      const wantsObject = String(requestHeaders.get('accept') || '').includes('pgrst.object')
+      const limit = Number(parsed.searchParams.get('limit') || rows.length)
+      const wanted = Number.isFinite(limit) && limit > 0 ? rows.slice(0, limit) : rows
+      headers.set('content-range', `0-${Math.max(wanted.length - 1, 0)}/${rows.length}`)
+      // HEAD (conteos exactos) no lleva cuerpo.
+      if (method === 'HEAD') return new Response(null, { status: 200, headers })
+      const body = method === 'GET' ? (wantsObject ? wanted[0] ?? null : wanted) : wanted[0] ?? null
       return new Response(JSON.stringify(body), { status: 200, headers })
     }
 
@@ -217,13 +270,56 @@ function recordError(message) {
   errors.push(message)
 }
 
+/* ------------------------- escenario: puente de sesión ---------------------- */
+
+async function runBridgeScenario(server, session) {
+  const window = globalThis.window
+  // Sólo existe la sesión de la web pública: el panel debe reutilizarla.
+  window.localStorage.removeItem('ugo-platform-admin-auth')
+  window.localStorage.setItem('ugo-platform-auth', JSON.stringify(session))
+  console.log('\nEscenario: sesión de la web reutilizada por el panel (?app=admin)')
+
+  const gateModule = await server.ssrLoadModule('/src/admin/AdminGate.tsx')
+  const experienceModule = await server.ssrLoadModule('/src/admin/AdminExperience.tsx')
+  const AdminGate = gateModule.default
+  const AdminExperience = experienceModule.default
+  const container = window.document.getElementById('root')
+  const root = createRoot(container)
+
+  root.render(
+    React.createElement(AdminGate, {
+      children: (value) => React.createElement(AdminExperience, { session: value }),
+    }),
+  )
+
+  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+  const deadline = Date.now() + 8000
+  while (Date.now() < deadline && !window.document.querySelector('.ad-shell')) await wait(150)
+
+  if (!window.document.querySelector('.ad-shell')) {
+    const gate = window.document.querySelector('.ad-gate')
+    const detail = window.document.querySelector('.ad-gate-error, .ad-gate-block p, .ad-gate-notice')?.textContent || ''
+    throw new Error(
+      gate
+        ? `El panel no adoptó la sesión de la web: siguió mostrando la pantalla de acceso. Detalle: "${detail}"`
+        : 'El panel no renderizó tras adoptar la sesión.',
+    )
+  }
+  const heading = window.document.querySelector('.ad-page-head h2')?.textContent || ''
+  if (!heading.includes('Visión general')) throw new Error(`El panel abrió en una sección inesperada: "${heading}"`)
+  console.log(`  ✓ gate     sesión adoptada · panel abierto en "${heading}"`)
+  root.unmount()
+  await wait(150)
+}
+
 async function main() {
+  const bridgeMode = process.argv.includes('--bridge')
   const window = installDom()
   installFetchStub()
 
   const session = {
-    access_token: 'test-access-token',
-    refresh_token: 'test-refresh-token',
+    access_token: fakeJwt(),
+    refresh_token: fakeJwt(60 * 24 * 30),
     token_type: 'bearer',
     expires_in: 60 * 60 * 24 * 30,
     expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30,
@@ -237,7 +333,7 @@ async function main() {
       created_at: iso(6000),
     },
   }
-  window.localStorage.setItem('ugo-platform-admin-auth', JSON.stringify(session))
+  if (!bridgeMode) window.localStorage.setItem('ugo-platform-admin-auth', JSON.stringify(session))
 
   window.addEventListener('error', (event) => recordError(`window.error: ${event.message}`))
   window.addEventListener('unhandledrejection', (event) => recordError(`unhandledrejection: ${event.reason}`))
@@ -251,6 +347,14 @@ async function main() {
   })
 
   try {
+    if (bridgeMode) {
+      await runBridgeScenario(server, session)
+      const unexpectedBridge = errors.filter((message) => !/WebSocket|realtime|ECONNREFUSED|attachEvent/i.test(String(message)))
+      if (unexpectedBridge.length > 0) throw new Error(`Errores de runtime: ${unexpectedBridge.join(' | ')}`)
+      console.log('\nSmoke test del panel admin (puente de sesión): OK')
+      process.exit(0)
+    }
+
     const mod = await server.ssrLoadModule('/src/admin/AdminExperience.tsx')
     const AdminExperience = mod.default
     const container = window.document.getElementById('root')

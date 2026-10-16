@@ -34,6 +34,9 @@ sincronización Realtime y mensajes de error traducidos de los contratos vigente
 
 - El rol se valida en `usuarios` (`tipo` admin/superadmin y `activo`), no en el frontend.
 - La sesión admin se guarda en `ugo-platform-admin-auth`, separada de la app cliente.
+- Si ya iniciaste sesión en la web con una cuenta admin, el panel reutiliza esa sesión
+  (`src/lib/sessionBridge.ts`) y entra directo; también hay accesos en la barra superior
+  (sólo para cuentas admin) y en el pie del sitio.
 - Los contratos ausentes o sin permisos (RLS) se muestran como aviso; nunca se inventan datos ni se rellena con ceros.
 - Documentación: [`docs/admin-panel-20261015.md`](docs/admin-panel-20261015.md).
 

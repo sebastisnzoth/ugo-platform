@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabaseAdmin, UGO_TEST_REF, UGO_TEST_URL, isAdminRole, type AdminRole } from '../lib/supabaseAdmin'
+import { readBridgedSession } from '../lib/sessionBridge'
 import './admin-auth.css'
 
 export type AdminSession = {
@@ -75,7 +76,27 @@ export default function AdminGate({ children }: { children: (value: AdminSession
         if (error) throw error
         if (!data.session) {
           const wantsRecovery = params.get('recovery') === '1'
-          if (alive) setState(wantsRecovery ? { phase: 'recovery', error: '', notice: '' } : { phase: 'locked', error: '', notice: '' })
+          if (wantsRecovery) {
+            if (alive) setState({ phase: 'recovery', error: '', notice: '' })
+            return
+          }
+          // Reutiliza la sesión de la web/cliente si ya existe en este navegador.
+          const bridged = readBridgedSession()
+          if (bridged) {
+            const { data: adopted, error: adoptError } = await supabaseAdmin.auth.setSession(bridged)
+            if (!adoptError && adopted.session) {
+              const bridgedResult = await authorize(adopted.session)
+              if (!alive) return
+              if (bridgedResult.ok) {
+                setState({ phase: 'ready', value: bridgedResult.value })
+                return
+              }
+              await supabaseAdmin.auth.signOut()
+              setState({ phase: 'locked', error: bridgedResult.message, notice: '' })
+              return
+            }
+          }
+          if (alive) setState({ phase: 'locked', error: '', notice: '' })
           return
         }
         const result = await authorize(data.session)
@@ -315,7 +336,13 @@ export default function AdminGate({ children }: { children: (value: AdminSession
             <button type="button" className="ad-gate-link" onClick={sendRecovery} disabled={busy}>
               Recuperar contraseña
             </button>
-            <p className="ad-gate-note">El panel no crea usuarios ni credenciales. Si tu cuenta no aparece como admin activo, pedile a un super admin que la habilite.</p>
+            <p className="ad-gate-note">
+              El panel no crea usuarios ni credenciales. Si tu cuenta no aparece como admin activo, pedile a un super admin que la habilite.
+              {' '}
+              <a className="ad-gate-inline-link" href={window.location.pathname}>
+                Volver a la web
+              </a>
+            </p>
           </form>
         )}
       </section>

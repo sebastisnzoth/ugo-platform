@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="es"><head><meta charset="UTF-8"/><title>UGO</title>
+<script>
+  // GitHub Pages no tiene fallback SPA: los enlaces profundos (/admin/, /client/, /superadmin/)
+  // se traducen a la entrada correspondiente de la app.
+  (function () {
+    var path = window.location.pathname.replace(/\/+$/, '')
+    var match = path.match(/\/(admin|superadmin|client)$/i)
+    var base = match ? path.slice(0, path.length - match[0].length) : path
+    if (!base) base = '/ugo-platform'
+    var query = window.location.search || ''
+    window.location.replace(base + '/' + (match ? (query ? query + '&app=' + match[1].toLowerCase() : '?app=' + match[1].toLowerCase()) : query))
+  })()
+</script>
+</head><body><p>Redirigiendo a UGO…</p></body></html>

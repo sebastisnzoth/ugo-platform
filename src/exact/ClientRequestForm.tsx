@@ -63,6 +63,12 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
   const ch=supabase.channel('zip-client-service-'+created.id).on('postgres_changes',{event:'UPDATE',schema:'public',table:'servicios',filter:'id=eq.'+created.id},()=>void refresh()).subscribe()
   return()=>{active=false;window.clearInterval(interval);void supabase.removeChannel(ch)}
  },[created?.id])
+ async function beginAnotherOrder(){
+  const {data:{user}}=await supabase.auth.getUser()
+  if(user){sessionStorage.removeItem(orderStorageKey(user.id));sessionStorage.removeItem(draftStorageKey(user.id))}
+  setCreated(null);setLiveStatus(null);setDispatchMessage('');setTrackingError('');setSubmitError('')
+  setCategoryId('');setDescription('');setAddress('');setPhotos([]);setScheduledAt('');setUrgency('Lo antes posible');setStep(1)
+ }
  async function submitOrder(){
   if(busy||created||!selected||!canDetails)return
   setBusy(true);setSubmitError('')
@@ -127,6 +133,7 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
     {dispatchMessage&&<p role="status">{dispatchMessage}</p>}
     {created&&<p role="status">Estado actual UGO TEST: <strong>{liveStatus?.estado||created.estado}</strong>{liveStatus?.proveedor_id?' · Proveedor asignado':' · Sin proveedor asignado'}</p>}
     {trackingError&&<p role="alert">{trackingError}</p>}
+    {created&&<button type="button" className="outline-button" onClick={()=>void beginAnotherOrder()}>Crear otro pedido independiente</button>}
     {created&&<div className="form-actions"><button className="primary-button" disabled={dispatching||!!dispatchMessage} onClick={()=>void dispatchOrder()}>{dispatching?'Comprobando GPS y buscando…':'Iniciar búsqueda con mi GPS'}</button><small>Solo se envía tras obtener GPS reciente y guardar la ubicación en UGO TEST.</small></div>}
     <div className="form-actions split"><button className="outline-button" disabled={busy||!!created} onClick={()=>setStep(2)}><ChevronLeft size={17}/> Editar</button><button className="primary-button" disabled={busy||!!created||!canDetails} onClick={()=>void submitOrder()}>{busy?"Guardando…":created?"Pedido guardado":"Confirmar pedido"} <Search size={17}/></button></div></>}
   </section>

@@ -1,7 +1,7 @@
 import {useEffect,useState,type FormEvent} from 'react'
 import {Camera,ChevronLeft,ChevronRight,MapPin,ShieldCheck,Search} from 'lucide-react'
 import {supabase} from './supabase'
-import {createOwnedClientOrder,recoverOrNewDraftId,uploadDraftEvidence,draftStorageKey} from './clientOrderService'
+import {createOwnedClientOrder,recoverOrNewDraftId,uploadDraftEvidence,draftStorageKey,dispatchOwnedClientOrder} from './clientOrderService'
 
 type Category={id:string;nombre:string;emoji:string|null}
 type Props={initialCategory:string;onBack:()=>void}
@@ -20,6 +20,8 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
  const [paymentMethod,setPaymentMethod]=useState<'efectivo'|'pix'>('efectivo')
  const [busy,setBusy]=useState(false)
  const [submitError,setSubmitError]=useState('')
+ const [dispatchMessage,setDispatchMessage]=useState('')
+ const [dispatching,setDispatching]=useState(false)
  const [created,setCreated]=useState<{id:string;estado:string;numero:number|null}|null>(null)
  useEffect(()=>{
   let active=true
@@ -53,6 +55,13 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
   }catch(error){setSubmitError(error instanceof Error?error.message:'No se pudo guardar el pedido en UGO TEST. Reintentá sin perder el borrador.')}
   finally{setBusy(false)}
  }
+ async function dispatchOrder(){
+  if(!created||dispatching)return
+  setDispatching(true);setSubmitError('');setDispatchMessage('')
+  try{const result=await dispatchOwnedClientOrder(created.id);setDispatchMessage(result)}
+  catch(error){setSubmitError(error instanceof Error?error.message:'El pedido sigue guardado, pero no pudimos iniciar la búsqueda.')}
+  finally{setDispatching(false)}
+ }
  const selected=categories.find(c=>c.id===categoryId)
  const scheduleValid=urgency!=='Elegir fecha'||(scheduledAt.length>0&&new Date(scheduledAt).getTime()>Date.now())
  const canDetails=description.trim().length>=10&&address.trim().length>=5&&scheduleValid
@@ -82,8 +91,10 @@ export default function ClientRequestForm({initialCategory,onBack}:Props){
     <div className="form-actions split"><button className="outline-button" onClick={()=>setStep(1)}><ChevronLeft size={17}/> Atrás</button><button className="primary-button" disabled={!canDetails} onClick={()=>setStep(3)}>Revisar solicitud <ChevronRight size={17}/></button></div></>}
    {step===3&&<><div className="form-heading"><span><ShieldCheck size={22}/></span><div><h2>Revisá tu solicitud</h2><p>Estos son tus datos, no ejemplos.</p></div></div>
     <div className="form-grid"><label><span>Método de pago</span><select value={paymentMethod} disabled={busy||!!created} onChange={e=>setPaymentMethod(e.target.value as 'efectivo'|'pix')}><option value="efectivo">Efectivo</option><option value="pix">PIX</option></select></label></div><div className="summary-box"><div><small>SERVICIO</small><strong>{selected?.nombre||'Sin categoría'}</strong><span>{description}</span></div><div><small>CUÁNDO</small><strong>{urgency==='Elegir fecha'?new Date(scheduledAt).toLocaleString('pt-BR'):urgency}</strong></div><div><small>DIRECCIÓN</small><strong>{address}</strong><span>{photos.length} fotos seleccionadas</span></div></div>
-    <div className="estimate"><span><ShieldCheck size={20}/></span><div><strong>{created?`Pedido #${created.numero??created.id} registrado en UGO TEST`:"Confirmar pedido en UGO TEST"}</strong><p>{created?`Estado actual: ${created.estado}. Consultá Actividad para seguirlo. Matching aún no iniciado por este formulario.`:"Confirmar guarda un pedido real. No inicia la búsqueda hasta verificar ubicación y reglas de matching."}</p></div></div>
+    <div className="estimate"><span><ShieldCheck size={20}/></span><div><strong>{created?`Pedido #${created.numero??created.id} registrado en UGO TEST`:"Confirmar pedido en UGO TEST"}</strong><p>{created?`Estado actual: ${created.estado}. Consultá Actividad para seguirlo. Usá «Iniciar búsqueda con mi GPS» para ofrecer el pedido a profesionales.`:"Confirmar guarda un pedido real. No inicia la búsqueda hasta verificar ubicación y reglas de matching."}</p></div></div>
     {submitError&&<p role="alert">{submitError}</p>}
+    {dispatchMessage&&<p role="status">{dispatchMessage}</p>}
+    {created&&<div className="form-actions"><button className="primary-button" disabled={dispatching||!!dispatchMessage} onClick={()=>void dispatchOrder()}>{dispatching?'Comprobando GPS y buscando…':'Iniciar búsqueda con mi GPS'}</button><small>Solo se envía tras obtener GPS reciente y guardar la ubicación en UGO TEST.</small></div>}
     <div className="form-actions split"><button className="outline-button" disabled={busy||!!created} onClick={()=>setStep(2)}><ChevronLeft size={17}/> Editar</button><button className="primary-button" disabled={busy||!!created||!canDetails} onClick={()=>void submitOrder()}>{busy?"Guardando…":created?"Pedido guardado":"Confirmar pedido"} <Search size={17}/></button></div></>}
   </section>
  </div>

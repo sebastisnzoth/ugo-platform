@@ -21,3 +21,282 @@
 @media(max-width:1180px){.ux-categories{grid-template-columns:repeat(3,minmax(0,1fr))}.ux-hero{grid-template-columns:1.2fr .8fr}.ux-hero-art .ux-hero-circle{width:165px;height:165px}.ux-bottom-row{grid-template-columns:1fr}}
 @media(max-width:850px){.ux-sidebar{transform:translateX(-110%);transition:transform .25s;box-shadow:0 0 40px #0e301e22}.ux-sidebar-open{transform:translateX(0)}.ux-close{position:absolute;right:18px;top:20px;display:block;border:0;background:#f1f6f3;border-radius:8px;padding:6px 11px;font-size:20px}.ux-backdrop{display:block;position:fixed;inset:0;z-index:39;background:#111d1880;border:0}.ux-main{margin-left:0}.ux-topbar{padding:0 22px}.ux-menu{display:block;background:transparent;border:0;font-size:23px;color:var(--green)}.ux-content{padding:22px 22px 95px}.ux-location{display:none}.ux-mobile-nav{display:flex;position:fixed;z-index:30;bottom:12px;left:13px;right:13px;height:65px;border:1px solid var(--line);border-radius:18px;background:#ffffffef;backdrop-filter:blur(12px);box-shadow:0 10px 35px #163c2626;align-items:center;justify-content:space-around}.ux-mobile-nav button{border:0;background:none;color:#7f9086;display:grid;justify-items:center;gap:4px;min-width:50px;font-size:10px}.ux-mobile-nav button.active{color:var(--green);font-weight:800}.ux-mobile-nav button span{font-size:23px}.ux-mobile-nav .ux-mobile-add{background:var(--green);color:white;width:49px;height:49px;min-width:49px;border-radius:14px;font-size:28px;transform:translateY(-8px)}}
 @media(max-width:620px){.ux-topbar{height:72px;padding:0 15px}.ux-content{padding:15px 14px 100px}.ux-topcopy h1{font-size:16px}.ux-topcopy p{display:none}.ux-hero{min-height:360px;display:block}.ux-hero-text{padding:28px 24px}.ux-hero h2{font-size:31px}.ux-hero-art{position:absolute;right:-30px;bottom:-55px;opacity:.23}.ux-hero-circle{width:180px;height:180px}.ux-floating{display:none}.ux-categories{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ux-category{min-height:125px;padding:14px}.ux-bottom-row{gap:13px}.ux-surface{padding:20px}.ux-section-title{align-items:flex-start}.ux-section-title h2{font-size:17px}.ux-section-title p{font-size:11px}.ux-stepper{gap:4px}.ux-stepper span{font-size:9px;padding:8px}.ux-request-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ===== Mejoras de interacción (2026-10) ===== */
+.uxugo textarea,.uxugo select{font:inherit;color:var(--ink)}
+.uxugo textarea:focus-visible,.uxugo select:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+.ux-view{animation:ux-view-in .28s ease both}
+@keyframes ux-view-in{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.ux-surface{transition:box-shadow .25s,transform .25s}
+.ux-hero-blob{position:absolute;width:320px;height:320px;border-radius:46% 54% 60% 40%/50% 42% 58% 50%;background:radial-gradient(circle at 30% 30%,#c8e8d5,#9fd0b8);opacity:.75;transform:rotate(12deg)}
+.ux-hero-circle{position:relative;z-index:1;box-shadow:0 22px 45px #0c7c6130}
+/* Chips de estado de pedido */
+.ux-chip{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:6px 12px;font-size:10px;font-weight:800;letter-spacing:.3px;white-space:nowrap;text-transform:capitalize}
+.ux-chip:before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.ux-chip-success{background:#e2f2ec;color:#0c7c61}.ux-chip-active{background:#e6f0ff;color:#2b62b8}
+.ux-chip-pending{background:#f2f4f2;color:#74817b}.ux-chip-danger{background:#fdeae6;color:#c2452c}
+.ux-chip-neutral{background:#eef1ef;color:#5c6b64}
+/* Filas de pedido */
+.uxugo .client-order-list .ux-order-row{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.ux-order-main{display:grid;gap:5px;min-width:0}.ux-order-main strong{font-size:13px}
+.ux-order-feature{margin:14px 0 4px;padding:18px;border:1px solid var(--line);border-radius:14px}
+/* Skeleton */
+.ux-skeleton{border-radius:12px;background:linear-gradient(100deg,#eef2ef 30%,#f7faf8 50%,#eef2ef 70%);background-size:220% 100%;animation:ux-shimmer 1.3s linear infinite;margin:10px 0}
+@keyframes ux-shimmer{from{background-position:180% 0}to{background-position:-80% 0}}
+/* Estado vacío */
+.ux-empty{display:grid;justify-items:center;gap:9px;text-align:center;padding:34px 18px;border:1px dashed #cfe0d6;border-radius:16px;background:#fbfdfc}
+.ux-empty-icon{width:52px;height:52px;border-radius:16px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-size:24px}
+.ux-empty strong{font-size:14px}.ux-empty p{font-size:12px;color:var(--muted);margin:0 0 6px}
+/* Stepper navegable */
+.ux-stepper button{border:0;border-radius:20px;background:#e9eeeb;padding:10px 13px;color:#7d8d83;font-size:11px;font-weight:700;cursor:pointer}
+.ux-stepper button.current{background:var(--green-soft);color:var(--green);font-weight:800}
+.ux-stepper button.done{background:#d5e9df;color:#075a48}
+.ux-stepper button:disabled{cursor:default}
+/* Formulario del wizard */
+.ux-form-grid{display:grid;gap:16px;margin:8px 0 22px}
+.ux-form-grid label{display:grid;gap:7px;font-size:12px;font-weight:700}
+.ux-form-grid input,.ux-form-grid textarea,.ux-form-grid select{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:white;font:inherit;font-size:13px}
+.ux-form-grid textarea{resize:vertical;line-height:1.5}
+.ux-fieldset{border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin:0}
+.ux-fieldset legend{font-size:12px;font-weight:700;padding:0 6px}
+.ux-radio-row{display:flex;flex-wrap:wrap;gap:9px}
+.ux-radio-row label{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:12px;font-weight:600;cursor:pointer}
+.ux-radio-row input{width:auto;accent-color:var(--green)}
+.ux-radio-row label.ux-radio-chosen{border-color:var(--green);background:var(--green-soft);color:var(--green);font-weight:800}
+/* Resumen */
+.ux-summary{display:grid;gap:11px;margin:14px 0 6px}
+.ux-summary div{display:grid;grid-template-columns:120px 1fr;gap:12px;border-bottom:1px solid var(--line);padding-bottom:11px}
+.ux-summary dt{font-size:10px;font-weight:800;letter-spacing:.8px;color:#9eaba5;text-transform:uppercase}
+.ux-summary dd{margin:0;font-size:13px;line-height:1.55}
+.ux-action-group{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+/* Inicio: stats y accesos */
+.ux-stat-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:22px 0}
+.ux-stat{background:white;border:1px solid var(--line);border-radius:15px;padding:17px 18px;display:grid;gap:5px}
+.ux-stat strong{font-size:23px;letter-spacing:-.8px;color:var(--green)}
+.ux-stat small{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.2px}
+.ux-orders-preview{margin-bottom:6px}
+.ux-section-tight{margin:0 0 15px;align-items:center}
+.ux-inline-action{display:inline-flex;align-items:center;text-decoration:none;margin-top:20px}
+.ux-inline-action:hover{background:var(--green-soft)}
+/* Sidebar: sitio y persona como botón */
+.ux-site-link{display:block;padding:9px 14px;font-size:11px;font-weight:700;color:var(--green);text-decoration:none;border-radius:10px}
+.ux-site-link:hover{background:var(--green-soft)}
+.ux-person{width:100%;border:0;background:transparent;text-align:left;cursor:pointer}
+.ux-person:hover{background:#f2f8f5;border-radius:12px}
+.ux-login-link{font-size:12px;font-weight:800;color:var(--green);padding:9px 13px;border:1px solid var(--green-soft);border-radius:10px;text-decoration:none}
+.ux-login-link:hover{background:var(--green-soft)}
+@media(max-width:620px){
+ .ux-stat-row{grid-template-columns:1fr 1fr 1fr;gap:8px}
+ .ux-stat{padding:13px 11px}.ux-stat strong{font-size:19px}
+ .ux-summary div{grid-template-columns:1fr;gap:3px}
+ .ux-action-group{justify-content:stretch}.ux-action-group .ux-primary,.ux-action-group .ux-secondary{flex:1}
+ .ux-action-row{flex-direction:column-reverse}
+ .ux-action-row .ux-secondary,.ux-action-row .ux-primary{width:100%}
+ .ux-stepper{flex-wrap:wrap}
+}
+@media(prefers-reduced-motion:reduce){.ux-view{animation:none}.ux-skeleton{animation:none}.ux-category:hover{transform:none}}
+
+/* ===== Herramientas de servicio (chat, evidencias, disputas) 2026-10-17 ===== */
+.uxp-service-tools{display:grid;gap:16px;margin-top:16px}
+.uxp-chat-list{list-style:none;padding:0;margin:12px 0;display:grid;gap:10px;max-height:320px;overflow-y:auto}
+.uxp-chat-list li{background:#f2f7f4;border-radius:12px;padding:10px 13px;max-width:80%}
+.uxp-chat-list li.mine{background:var(--green-soft);margin-left:auto}
+.uxp-chat-list li small{font-size:9px;color:var(--muted);display:block;margin-bottom:4px}
+.uxp-chat-list li p{margin:0;font-size:12px;line-height:1.5}
+.uxp-chat-empty{background:transparent!important;color:var(--muted);font-size:12px;text-align:center;max-width:100%!important}
+.uxp-chat-form{display:flex;gap:9px}
+.uxp-chat-form input{flex:1;min-width:0;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:13px}
+.uxp-evidence-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:12px 0}
+.uxp-evidence-item{display:grid;gap:6px;justify-items:center;padding:14px 10px;border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);background:#fbfdfc}
+.uxp-evidence-item:hover{border-color:var(--green)}
+.uxp-evidence-item small{font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.uxp-upload{display:inline-flex;align-items:center;gap:8px;border:1px dashed #b9cfc3;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--green);cursor:pointer}
+.uxp-upload:hover{background:var(--green-soft)}
+.uxp-upload input{display:none}
+.uxp-dispute-box{border:1px solid #f0c9ba;background:#fdf1eb;border-radius:12px;padding:14px;display:grid;gap:7px}
+.uxp-dispute-box p{margin:0;font-size:12px}
+.uxp-dispute-form{display:grid;gap:12px}
+.uxp-dispute-form label{display:grid;gap:6px;font-size:12px;font-weight:700}
+.uxp-dispute-form textarea,.uxp-dispute-form select{padding:11px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:12px;background:#fff}
+.uxp-stars{display:flex;gap:6px;margin:8px 0 14px}
+.uxp-stars button{border:0;background:transparent;font-size:30px;color:#d6ddd8;cursor:pointer;padding:0}
+.uxp-stars button.on{color:#f0b429}
+.uxp-kyc-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px;font-weight:700}
+.uxp-kyc-row>span:first-child{flex:1;min-width:160px}
+.uxp-photo-row{margin:6px 0}
+@media(max-width:620px){.uxp-chat-list li{max-width:95%}.uxp-kyc-row{flex-direction:column;align-items:flex-start}}
+
+/* ===== Modern UI/UX layer (2026-10) · tipografía, glass, micro-interacciones ===== */
+.uxugo{font-family:'DM Sans','Segoe UI',system-ui,-apple-system,sans-serif;background:
+  radial-gradient(1100px 520px at 88% -12%,#dff0e7 0%,transparent 62%),
+  radial-gradient(900px 460px at -12% 28%,#e7effc66 0%,transparent 58%),
+  var(--canvas)}
+.uxugo ::selection{background:#0c7c6133}
+.uxugo ::-webkit-scrollbar{width:10px;height:10px}
+.uxugo ::-webkit-scrollbar-thumb{background:#c5d6cd;background-clip:content-box;border:3px solid transparent;border-radius:999px}
+.uxugo ::-webkit-scrollbar-thumb:hover{background:#9db6aa;background-clip:content-box}
+.uxugo ::-webkit-scrollbar-track{background:transparent}
+
+/* Barra superior glass (sticky) */
+.ux-topbar{position:sticky;top:0;z-index:25;background:#ffffffd9;backdrop-filter:blur(16px) saturate(1.15);-webkit-backdrop-filter:blur(16px) saturate(1.15);border-bottom:1px solid #e4ebe8b3}
+
+/* Sidebar: degradado sutil + indicador activo */
+.ux-sidebar{background:linear-gradient(180deg,#ffffff 0%,#f6fbf8 100%)}
+.ux-brand>span{letter-spacing:-2.6px}
+.ux-side-links button{position:relative;transition:background .18s,color .18s,transform .18s}
+.ux-side-links button:hover{transform:translateX(2px)}
+.ux-side-links button.selected{background:linear-gradient(135deg,#e2f2ec,#d8eee4);box-shadow:inset 0 0 0 1px #0c7c6126}
+.ux-side-links button.selected span{transform:scale(1.08)}
+.ux-side-links button span{transition:transform .2s}
+.ux-new{background:linear-gradient(135deg,#119070,#0b6b52);box-shadow:0 8px 20px #0c7c6142;transition:transform .16s,box-shadow .16s}
+.ux-new:hover{transform:translateY(-1px);box-shadow:0 12px 28px #0c7c6155}
+
+/* Botones con profundidad */
+.ux-primary{background:linear-gradient(135deg,#119070,#0b6b52);box-shadow:0 6px 18px #0c7c613d;transition:transform .16s,box-shadow .16s,filter .16s}
+.ux-primary:hover{transform:translateY(-1px);box-shadow:0 11px 26px #0c7c6152;filter:saturate(1.06)}
+.ux-primary:active{transform:translateY(0) scale(.985)}
+.ux-secondary{transition:transform .16s,box-shadow .16s,border-color .16s,background .16s}
+.ux-secondary:hover:not(:disabled){transform:translateY(-1px);border-color:#0c7c6155;box-shadow:0 8px 18px #0c7c6114}
+.ux-secondary:active:not(:disabled){transform:translateY(0) scale(.985)}
+.ux-link{text-decoration:none;background-image:linear-gradient(#0c7c61,#0c7c61);background-size:0 1.5px;background-repeat:no-repeat;background-position:0 100%;transition:background-size .22s}
+.ux-link:hover{background-size:100% 1.5px}
+
+/* Superficies con sombra en capas */
+.ux-surface{border-radius:20px;box-shadow:0 1px 2px #163c260a,0 12px 32px #163c260d;transition:box-shadow .25s,transform .25s}
+.ux-surface:hover{box-shadow:0 2px 4px #163c260d,0 18px 44px #163c2614}
+.ux-chip{border:1px solid transparent;letter-spacing:.4px}
+.ux-chip-success{border-color:#0c7c612e}.ux-chip-active{border-color:#2b62b82e}
+.ux-chip-pending{border-color:#74817b2e}.ux-chip-danger{border-color:#c2452c2e}
+.ux-chip-neutral{border-color:#5c6b642e}
+
+/* Hero con degradado y glass */
+.ux-hero{border-radius:24px;background:linear-gradient(118deg,#d9efe5 0%,#eaf5ed 46%,#e4eefc 100%);box-shadow:0 24px 60px #0c7c6126}
+.ux-hero-blob{filter:blur(1px)}
+.ux-floating{background:#fffffff0;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 18px 48px #0c7c612e}
+.ux-hero .ux-primary{box-shadow:0 10px 26px #0c7c6145}
+
+/* Categorías con hover lift */
+.ux-category{border-radius:18px;box-shadow:0 1px 2px #163c260a;transition:border-color .2s,transform .2s,box-shadow .2s}
+.ux-category:hover{transform:translateY(-4px);border-color:#0c7c6144;box-shadow:0 16px 34px #0c7c6121}
+.ux-category:hover .ux-category-icon{transform:scale(1.08) rotate(-4deg)}
+.ux-category-icon{transition:transform .22s ease}
+.ux-category.ux-chosen{transform:translateY(-2px);box-shadow:0 12px 28px #0c7c6126}
+
+/* Stats con acento superior */
+.ux-stat{border-radius:18px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.ux-stat:hover{transform:translateY(-3px);box-shadow:0 16px 36px #0c7c611f}
+.ux-stat:before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#119070,transparent)}
+.ux-stat strong{letter-spacing:-1px}
+
+/* Stepper y lifecycle como pills */
+.ux-stepper button{border-radius:999px;transition:transform .16s,background .16s,color .16s}
+.ux-stepper button.current{transform:translateY(-1px);box-shadow:0 6px 16px #0c7c6126}
+.uxp-steps span{border-radius:999px;transition:transform .16s,background .16s}
+.uxp-steps span.current{transform:translateY(-1px)}
+
+/* Formularios con focus glow */
+.uxugo input,.uxugo textarea,.uxugo select{border-radius:12px;transition:border-color .18s,box-shadow .18s,background .18s}
+.uxugo input:focus,.uxugo textarea:focus,.uxugo select:focus{border-color:#0c7c6173;box-shadow:0 0 0 4px #0c7c611f;outline:none}
+.ux-radio-row label{transition:border-color .16s,background .16s,transform .16s}
+.ux-radio-row label:hover{transform:translateY(-1px);border-color:#0c7c6144}
+
+/* Chat, evidencias, ofertas */
+.uxp-chat-list li{box-shadow:0 2px 10px #163c260d}
+.uxp-chat-form input{border-radius:14px}
+.uxp-evidence-item{transition:transform .18s,box-shadow .18s,border-color .18s}
+.uxp-evidence-item:hover{transform:translateY(-3px);border-color:#0c7c6144;box-shadow:0 12px 28px #0c7c611c}
+.uxp-upload{border-radius:12px;transition:transform .16s,background .16s,border-color .16s}
+.uxp-upload:hover{transform:translateY(-1px);border-color:#0c7c61}
+.uxp-offer{border-radius:20px;box-shadow:0 1px 2px #163c260a,0 12px 30px #163c260d;transition:transform .2s,box-shadow .2s,border-color .2s}
+.uxp-offer:hover{transform:translateY(-3px);border-color:#0c7c613d;box-shadow:0 18px 42px #0c7c611f}
+.uxp-offer-actions .ux-primary,.uxp-offer-actions .ux-secondary{border-radius:12px}
+
+/* Alertas glass */
+.ux-alert{border-radius:14px;border:1px solid #e4ebe8cc;background:#fffffff0;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 14px 36px #163c261c}
+.ux-alert button{border-radius:8px;transition:background .16s}
+.ux-alert button:hover{background:#163c2612}
+
+/* Upload + inputs de perfil */
+.uxugo .client-profile-form input,.uxugo .client-profile-form select,.uxugo .client-profile-form textarea{border-radius:12px}
+.uxp-kyc-row{border-radius:10px;transition:background .16s}
+.uxp-kyc-row:hover{background:#f4faf7}
+
+/* Vacíos y skeletons */
+.ux-empty{border-radius:18px;background:linear-gradient(180deg,#fbfdfc,#f5faf7)}
+.ux-empty-icon{box-shadow:0 10px 24px #0c7c6126}
+.ux-skeleton{border-radius:14px}
+
+/* Navegación móvil flotante */
+.ux-mobile-nav{background:#fffffff2;backdrop-filter:blur(20px) saturate(1.2);-webkit-backdrop-filter:blur(20px) saturate(1.2);border:1px solid #ffffff99;box-shadow:0 18px 50px #163c262e}
+.ux-mobile-nav button{border-radius:12px;padding:6px 10px;transition:color .18s,background .18s,transform .18s}
+.ux-mobile-nav button.active{background:#e2f2ec;transform:translateY(-1px)}
+.ux-mobile-nav .ux-mobile-add{background:linear-gradient(135deg,#119070,#0b6b52);box-shadow:0 10px 26px #0c7c614d}
+.ux-mobile-nav .ux-mobile-add:hover{transform:translateY(-8px) scale(1.04)}
+
+/* Foco consistente */
+.uxugo a:focus-visible,.uxugo button:focus-visible,.uxugo input:focus-visible,.uxugo textarea:focus-visible,.uxugo select:focus-visible{outline:2px solid #0c7c61;outline-offset:2px}
+
+@media(prefers-reduced-motion:reduce){
+  .ux-side-links button:hover,.ux-primary:hover,.ux-secondary:hover,.ux-category:hover,.ux-stat:hover,.uxp-offer:hover,.uxp-evidence-item:hover,.ux-mobile-nav button.active{transform:none}
+}
+
+/* ===== Avatares y foto de perfil (2026-10-17) ===== */
+.ux-person-symbol img,
+.ux-avatar img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+.ux-avatar img { width: 36px; height: 36px; }
+.uxp-photo-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.uxp-photo-card p { margin: 4px 0 8px; color: var(--muted); font-size: 13px; }
+.uxp-avatar-lg {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  color: var(--muted);
+  background: var(--brand-soft);
+  border: 3px solid var(--brand-soft);
+}
+.uxp-avatar-placeholder { flex: 0 0 84px; }
+.uxp-photo-preview {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--brand-soft);
+}
+.uxp-ghost-btn {
+  border: 1px solid var(--border);
+  background: transparent;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand);
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.uxp-ghost-btn:hover { border-color: var(--brand); background: var(--brand-soft); }
+.uxp-evidence-item img {
+  width: 100%;
+  height: 92px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.uxp-evidence-item { flex-direction: column; align-items: center; }

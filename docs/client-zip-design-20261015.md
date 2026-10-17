@@ -13,6 +13,12 @@ Referencia: `client-app-uxui-design (1).zip` suministrado por el propietario.
 - Contrato real de categorías y de creación de servicios, GPS, matching, pagos y chat.
 - Pruebas E2E con clientes TEST, autorización y revisión RLS.
 
+## Mejoras (2026-10-17)
+- Wizard de "Nuevo servicio" navegable en 3 pasos (categoría → detalles → confirmación) con borrador local (localStorage), sin crear solicitudes ficticias.
+- Inicio con datos reales: pedidos recientes, contadores (pedidos, direcciones, servicios en curso) y saludo por cuenta.
+- Chips de estado por pedido, skeletons de carga, estados vacíos con CTA y transiciones de vista (respetando `prefers-reduced-motion`).
+- Navegación completa: "Volver al sitio", acceso a perfil desde la barra lateral, "Ingresar" en la app sin sesión y CTA a la app desde la landing al iniciar sesión.
+
 ## Publicación
 - No modificar producción ni el repositorio fuente `ugo-admin-panel`.
 - Build/CI same-SHA, revisión de PR y despliegue por GitHub Actions.

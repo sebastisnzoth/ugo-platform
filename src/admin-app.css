@@ -1,0 +1,100 @@
+/* Panel Admin / Super Admin — tema control center oscuro sobre la base uxugo */
+.uxadmin{--ink:#e8f0ec;--muted:#8fa39b;--line:#243430;--canvas:#0e1614;--green:#22b98d;--green-dark:#0d8a66;--green-soft:#123328;color:var(--ink);background:var(--canvas)}
+.uxadmin .ux-sidebar{background:#121c19;border-color:var(--line)}
+.uxadmin .ux-brand>span{color:#dff5ec}
+.uxadmin .ux-brand>span span{color:#22b98d}
+.uxadmin .ux-new{background:var(--green);color:#042117}
+.uxadmin .ux-side-links button{color:#93a8a0}
+.uxadmin .ux-side-links button:hover{background:#182622}
+.uxadmin .ux-side-links button.selected{background:var(--green-soft);color:var(--green)}
+.uxadmin .ux-help{background:#182622;color:var(--green)}
+.uxadmin .ux-help strong{color:#cfe5dc}
+.uxadmin .ux-person{color:var(--ink)}
+.uxadmin .ux-person:hover{background:#182622}
+.uxadmin .ux-person-symbol{background:#1c3329;color:var(--green)}
+.uxadmin .ux-topbar{background:#121c19;border-color:var(--line)}
+.uxadmin .ux-location{background:#182622;color:#9db3aa}
+.uxadmin .ux-avatar{background:#1c3329;color:var(--green)}
+.uxadmin .ux-content .ux-surface{background:#15211d;border-color:var(--line)}
+.uxadmin .ux-stat{background:#15211d;border-color:var(--line)}
+.uxadmin .ux-stat strong{color:#3fd9a8}
+.uxadmin .client-panel{background:#15211d;border-color:var(--line)}
+.uxadmin .ux-empty{background:#131e1a;border-color:#2a3b35}
+.uxadmin .ux-alert{background:#2a2320;color:#e8d5c8}
+.uxadmin .uxp-alert-error{background:#3a1f1a;color:#f0b9a8}
+.uxadmin .uxp-alert-ok{background:#123328;color:#a6e6cf}
+.uxadmin .ux-chip-success{background:#123328;color:#3fd9a8}
+.uxadmin .ux-chip-active{background:#152a3d;color:#7db8ff}
+.uxadmin .ux-chip-pending{background:#2a2f2c;color:#a8b5ae}
+.uxadmin .ux-chip-danger{background:#3a1f1a;color:#f0a08a}
+.uxadmin .ux-chip-neutral{background:#222b28;color:#93a8a0}
+.uxadmin .client-order-list .ux-order-row{border-color:var(--line)}
+.uxadmin .client-order-list li{background:#15211d;border-color:var(--line)}
+.uxadmin .client-order-list small,.uxadmin .client-order-list span{color:var(--muted)}
+.uxadmin .ux-order-main strong{color:var(--ink)}
+.uxadmin .ux-secondary{background:#1c2b26;border-color:var(--line);color:var(--green)}
+.uxadmin .ux-secondary:hover{background:#23352f}
+.uxadmin .ux-primary{background:var(--green);color:#042117}
+.uxadmin .ux-primary:hover{background:#2ed3a2}
+.uxadmin .ux-link{color:var(--green)}
+.uxadmin .ux-site-link{color:var(--green)}
+.uxadmin .ux-site-link:hover{background:var(--green-soft)}
+.uxadmin .ux-login-link{color:var(--green);border-color:var(--line)}
+.uxadmin .ux-login-link:hover{background:var(--green-soft)}
+.uxadmin .ux-note{color:#9a9384!important}
+.uxadmin input,.uxadmin textarea,.uxadmin select{background:#101b17;border-color:var(--line);color:var(--ink)}
+.uxadmin .client-muted{color:var(--muted)!important}
+.uxadmin .ux-skeleton{background:linear-gradient(100deg,#1a2622 30%,#22302b 50%,#1a2622 70%);background-size:220% 100%}
+.uxadmin .ux-mobile-nav{background:#121c19ef;border-color:var(--line)}
+.uxadmin .ux-mobile-nav button{color:#8fa39b}
+.uxadmin .ux-mobile-nav button.active{color:var(--green)}
+.uxadmin .ux-backdrop{background:#000a}
+
+/* Rol y acceso */
+.adm-role-chip{margin:0 14px 6px;padding:9px 14px;border-radius:10px;background:#1c2b26;color:#9db3aa;font-size:10px;font-weight:800;letter-spacing:1px;text-align:center}
+.adm-role-chip.adm-role-super{background:#2b2114;color:#f0c268}
+.adm-gate{min-height:100vh;display:grid;place-items:center;padding:24px}
+.adm-gate-card{width:min(100%,420px);background:#15211d;border:1px solid var(--line);border-radius:20px;padding:34px;display:grid;gap:14px}
+.adm-gate-card h1{margin:0;font-size:26px;letter-spacing:-.8px}
+.adm-gate-card p{margin:0;font-size:13px;line-height:1.6;color:var(--muted)}
+.adm-gate-card form{display:grid;gap:12px}
+.adm-gate-card input{height:44px;border:1px solid var(--line);border-radius:10px;background:#101b17;color:var(--ink);padding:0 13px;font:inherit;font-size:13px}
+.adm-kicker{display:inline-block;background:#000;color:#fff;padding:5px 8px;border-radius:6px;font-size:10px;font-weight:800;letter-spacing:1.2px}
+.adm-gate-error{background:#3a1f1a;color:#f0b9a8;border-radius:10px;padding:11px 13px;font-size:12px;margin:0}
+
+/* Métricas y filas */
+.adm-metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.adm-metric-grid .ux-stat strong{font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.adm-filter{height:40px;border:1px solid var(--line);border-radius:10px;background:#101b17;color:var(--ink);padding:0 12px;font:inherit;font-size:12px}
+.adm-row-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+.adm-chip{border-radius:8px;padding:5px 10px;font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase}
+.adm-chip-admin{background:#152a3d;color:#7db8ff}
+.adm-chip-super{background:#2b2114;color:#f0c268}
+.adm-chip-prov{background:#123328;color:#3fd9a8}
+.adm-chip-cli{background:#222b28;color:#93a8a0}
+
+/* Disputas */
+.adm-dispute{display:grid;gap:12px}
+.adm-resolve-form{display:grid;gap:11px;border-top:1px solid var(--line);padding-top:12px}
+.adm-resolve-form label{display:grid;gap:6px;font-size:11px;font-weight:700;color:var(--muted)}
+.adm-resolve-form textarea{padding:11px;border:1px solid var(--line);border-radius:10px;background:#101b17;color:var(--ink);font:inherit;font-size:12px;resize:vertical}
+.adm-resolve-form select{height:40px}
+
+@media(max-width:1180px){.adm-metric-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:620px){
+  .adm-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .adm-row-actions{width:100%;justify-content:flex-start}
+}
+
+/* Modern layer admin */
+.adm-metric-grid .ux-stat{border-radius:16px}
+.uxadmin .ux-stat:hover{transform:translateY(-3px);box-shadow:0 18px 40px #00000042}
+.uxadmin .ux-surface{border-radius:18px;box-shadow:0 2px 6px #00000022,0 18px 44px #00000026}
+.uxadmin .ux-surface:hover{box-shadow:0 4px 10px #0000002e,0 24px 56px #00000033}
+.adm-gate-card{border-radius:22px;box-shadow:0 30px 80px #00000055}
+.adm-gate-card input:focus{border-color:#22b98d88;box-shadow:0 0 0 4px #22b98d26;outline:none}
+.adm-role-chip{border-radius:999px;letter-spacing:1.4px}
+.uxadmin .ux-alert{border-radius:14px}
+.adm-chip{border-radius:999px}
+.adm-filter{border-radius:12px;transition:border-color .18s,box-shadow .18s}
+.adm-filter:focus{border-color:#22b98d88;box-shadow:0 0 0 4px #22b98d26;outline:none}

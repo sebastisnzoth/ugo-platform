@@ -11,13 +11,17 @@ import {
   approveService,
   cancelClientService,
   cashPaymentEnabled,
+  clientPhotoUrl,
   confirmCashPayment,
   createServiceRequest,
   loadClientPayments,
+  loadClientPhotoPath,
   loadMyReview,
+  loadPaymentPreference,
   loadServicePayment,
   rateService,
   selectPaymentMethod,
+  setPaymentPreference,
 } from './clientData'
 import type { RealCategory, ServicePayment } from './clientData'
 import { getServiceTracking } from './serviceContracts'
@@ -60,6 +64,7 @@ export default function ClientExperience() {
   const [draft, setDraft] = useState<RequestDraft>({ category: 'Plomería', categoryId: null, title: '', details: '', urgency: 'flexible', address: '' })
   const [places, setPlaces] = useState<{ id: string; etiqueta: string; direccion: string }[]>([])
   const [realCats, setRealCats] = useState<RealCategory[]>([])
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const { orders, reload: reloadOrders } = useClientOrders(session, 30)
 
   useEffect(() => {
@@ -87,6 +92,7 @@ export default function ClientExperience() {
       .select('id,etiqueta,direccion').eq('usuario_id', session.user.id)
       .order('es_predeterminada', { ascending: false }).limit(6)
       .then(({ data }) => setPlaces((data || []) as { id: string; etiqueta: string; direccion: string }[]))
+    loadClientPhotoPath(session.user.id).then(path => setAvatarUrl(clientPhotoUrl(path)))
   }, [session])
 
   useEffect(() => {
@@ -184,7 +190,7 @@ export default function ClientExperience() {
         <a className="ux-site-link" href="./">← Volver al sitio</a>
         <div className="ux-help">◉ <span><strong>¿Necesitás ayuda?</strong><small>Centro de soporte UGO</small></span></div>
         <button className="ux-person" onClick={() => go('profile')}>
-          <span className="ux-person-symbol">◉</span>
+          <span className="ux-person-symbol">{avatarUrl ? <img src={avatarUrl} alt="" /> : '◉'}</span>
           <span><strong>{firstName || 'Tu cuenta'}</strong><small>{session ? 'Cliente UGO' : 'Ingresá a UGO'}</small></span>
         </button>
       </div>
@@ -196,7 +202,7 @@ export default function ClientExperience() {
         <div className="ux-top-right">
           <span className="ux-location">⌖ Florianópolis</span>
           {session
-            ? <span className="ux-avatar" title={session.user.email}>◉</span>
+            ? <span className="ux-avatar" title={session.user.email}>{avatarUrl ? <img src={avatarUrl} alt="" /> : '◉'}</span>
             : <a className="ux-login-link" href="./">Ingresar</a>}
         </div>
       </header>
@@ -522,6 +528,9 @@ function PaymentsView({ session }: { session: Session | null }) {
   const [payments, setPayments] = useState<ServicePayment[]>([])
   const [error, setError] = useState('')
   const [loaded, setLoaded] = useState(false)
+  const [preference, setPreference] = useState<'efectivo' | 'pix'>('efectivo')
+  const [prefBusy, setPrefBusy] = useState(false)
+  const [prefNotice, setPrefNotice] = useState('')
 
   useEffect(() => {
     if (!session) { setLoaded(true); return }
@@ -529,7 +538,21 @@ function PaymentsView({ session }: { session: Session | null }) {
       .then(list => { setPayments(list); setError('') })
       .catch(err => setError(err instanceof Error ? err.message : 'No pudimos cargar tus pagos.'))
       .finally(() => setLoaded(true))
+    loadPaymentPreference(session.user.id).then(setPreference).catch(() => {})
   }, [session])
+
+  function choosePreference(next: 'efectivo' | 'pix') {
+    if (!session || prefBusy || next === preference) return
+    const previous = preference
+    setPreference(next); setPrefBusy(true); setPrefNotice('')
+    setPaymentPreference(next)
+      .then(() => setPrefNotice(next === 'pix' ? 'PIX quedó como preferencia para tus próximos pedidos.' : 'Efectivo quedó como preferencia para tus próximos pedidos.'))
+      .catch(err => {
+        setPreference(previous)
+        setPrefNotice(err instanceof Error ? err.message : 'No pudimos guardar la preferencia. Efectivo sigue disponible por defecto.')
+      })
+      .finally(() => setPrefBusy(false))
+  }
 
   return <section className="client-panel">
     <span className="client-kicker">PAGOS REALES</span><h1>Mis pagos</h1>
@@ -551,6 +574,19 @@ function PaymentsView({ session }: { session: Session | null }) {
                 </div>
                 <span className={'ux-chip ux-chip-' + orderTone(payment.estado)}>{payment.estado}</span>
               </li>)}</ul>}
+    <div className="uxp-categories">
+      <h2>Preferencia de pago</h2>
+      <p>Método predefinido para tus próximos pedidos (contrato preorder_payment_preference).</p>
+      <div className="ux-radio-row">
+        <label className={preference === 'efectivo' ? 'ux-radio-chosen' : ''}>
+          <input type="radio" name="pref" checked={preference === 'efectivo'} onChange={() => choosePreference('efectivo')} disabled={prefBusy} /> Efectivo
+        </label>
+        <label className={preference === 'pix' ? 'ux-radio-chosen' : ''}>
+          <input type="radio" name="pref" checked={preference === 'pix'} onChange={() => choosePreference('pix')} disabled={prefBusy} /> Pix
+        </label>
+      </div>
+      {prefNotice && <p role="status">{prefNotice}</p>}
+    </div>
     <p className="client-muted">Estados reales del contrato de pagos UGO (pendiente → autorizado → retenido → liberado). El cobro en efectivo lo confirmás vos desde el servicio activo.</p>
   </section>
 }

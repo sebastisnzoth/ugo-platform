@@ -85,3 +85,16 @@
   .adm-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .adm-row-actions{width:100%;justify-content:flex-start}
 }
+
+/* Modern layer admin */
+.adm-metric-grid .ux-stat{border-radius:16px}
+.uxadmin .ux-stat:hover{transform:translateY(-3px);box-shadow:0 18px 40px #00000042}
+.uxadmin .ux-surface{border-radius:18px;box-shadow:0 2px 6px #00000022,0 18px 44px #00000026}
+.uxadmin .ux-surface:hover{box-shadow:0 4px 10px #0000002e,0 24px 56px #00000033}
+.adm-gate-card{border-radius:22px;box-shadow:0 30px 80px #00000055}
+.adm-gate-card input:focus{border-color:#22b98d88;box-shadow:0 0 0 4px #22b98d26;outline:none}
+.adm-role-chip{border-radius:999px;letter-spacing:1.4px}
+.uxadmin .ux-alert{border-radius:14px}
+.adm-chip{border-radius:999px}
+.adm-filter{border-radius:12px;transition:border-color .18s,box-shadow .18s}
+.adm-filter:focus{border-color:#22b98d88;box-shadow:0 0 0 4px #22b98d26;outline:none}

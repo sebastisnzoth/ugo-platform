@@ -138,3 +138,61 @@ export async function rateService(input: {
   const { error } = await supabase.from('resenas').insert(payload)
   if (error) throw new Error(messageOf(error, 'No pudimos enviar la calificación.'))
 }
+
+// ---------- Ampliaciones 2026-10-17: foto, preferencia de pago, contraseña ----------
+
+const CLIENT_PHOTO_EXT: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }
+
+/** Foto de perfil del cliente (bucket client-public + perfiles_cliente.foto_perfil_path). */
+export async function uploadClientPhoto(userId: string, file: File): Promise<{ path: string; publicUrl: string }> {
+  const ext = CLIENT_PHOTO_EXT[file.type]
+  if (!ext) throw new Error('Usá una imagen JPG, PNG o WebP.')
+  if (file.size > 5 * 1024 * 1024) throw new Error('La foto debe pesar hasta 5 MB.')
+  const unique = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2)
+  const path = `${userId}/profile/${Date.now()}-${unique}.${ext}`
+  const uploaded = await supabase.storage.from('client-public').upload(path, file, { contentType: file.type, cacheControl: '3600', upsert: false })
+  if (uploaded.error) throw new Error(messageOf(uploaded.error, 'No pudimos subir la foto.'))
+  const { data, error } = await supabase.from('perfiles_cliente')
+    .select('foto_perfil_path').eq('usuario_id', userId).maybeSingle()
+  const previous = (data as { foto_perfil_path?: string | null } | null)?.foto_perfil_path ?? null
+  const { error: saveError } = await supabase.from('perfiles_cliente')
+    .upsert({ usuario_id: userId, foto_perfil_path: path }, { onConflict: 'usuario_id' })
+  if (saveError) {
+    await supabase.storage.from('client-public').remove([path]).catch(() => {})
+    throw new Error(messageOf(saveError, 'No pudimos guardar la foto en tu perfil.'))
+  }
+  if (previous && previous !== path) await supabase.storage.from('client-public').remove([previous]).catch(() => {})
+  void error
+  const publicUrl = supabase.storage.from('client-public').getPublicUrl(path).data.publicUrl
+  return { path, publicUrl }
+}
+
+export function clientPhotoUrl(path: string | null | undefined): string | null {
+  if (!path) return null
+  return supabase.storage.from('client-public').getPublicUrl(path).data.publicUrl
+}
+
+export async function loadClientPhotoPath(userId: string): Promise<string | null> {
+  const { data, error } = await supabase.from('perfiles_cliente')
+    .select('foto_perfil_path').eq('usuario_id', userId).maybeSingle()
+  if (error) return null
+  return (data as { foto_perfil_path?: string | null } | null)?.foto_perfil_path ?? null
+}
+
+/** Preferencia de pago pre-orden (efectivo | pix). */
+export async function loadPaymentPreference(userId: string): Promise<'efectivo' | 'pix'> {
+  const { data } = await supabase.from('preferencias_pago_cliente')
+    .select('metodo').eq('usuario_id', userId).maybeSingle()
+  return (data as { metodo?: string } | null)?.metodo === 'pix' ? 'pix' : 'efectivo'
+}
+
+export async function setPaymentPreference(metodo: 'efectivo' | 'pix'): Promise<void> {
+  const { error } = await supabase.rpc('set_preorder_payment_preference', { p_metodo: metodo })
+  if (error) throw new Error(messageOf(error, 'No pudimos guardar la preferencia de pago.'))
+}
+
+export async function changePassword(password: string): Promise<void> {
+  if (password.length < 8) throw new Error('La nueva contraseña debe tener al menos 8 caracteres.')
+  const { error } = await supabase.auth.updateUser({ password })
+  if (error) throw new Error(messageOf(error, 'No pudimos actualizar la contraseña.'))
+}

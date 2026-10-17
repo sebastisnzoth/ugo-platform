@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import {
@@ -34,6 +34,13 @@ export default function ServiceJobTools({ serviceId, serviceEstado, session, act
   const [disputeOpen, setDisputeOpen] = useState(false)
   const [motivoCodigo, setMotivoCodigo] = useState('')
   const [motivo, setMotivo] = useState('')
+  const chatListRef = useRef<HTMLUListElement>(null)
+
+  // Auto-scroll al mensaje más nuevo.
+  useEffect(() => {
+    const list = chatListRef.current
+    if (list) list.scrollTop = list.scrollHeight
+  }, [messages])
 
   const reload = useCallback(() => {
     loadChat(serviceId).then(setMessages).catch(error => setNotice(error instanceof Error ? error.message : 'Error de chat.'))
@@ -93,7 +100,7 @@ export default function ServiceJobTools({ serviceId, serviceEstado, session, act
     <section className="ux-surface uxp-chat">
       <span className="ux-subtitle">CHAT DEL SERVICIO</span>
       <h2>Conversación</h2>
-      <ul className="uxp-chat-list">{messages.map(message =>
+      <ul className="uxp-chat-list" ref={chatListRef}>{messages.map(message =>
         <li key={message.id} className={message.emisor_id === session.user.id ? 'mine' : ''}>
           <small>{message.emisor_rol === 'cliente' ? 'Cliente' : 'Proveedor'} · {new Date(message.created_at).toLocaleString('es', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</small>
           <p>{message.contenido}</p>
@@ -110,10 +117,13 @@ export default function ServiceJobTools({ serviceId, serviceEstado, session, act
       <span className="ux-subtitle">EVIDENCIAS</span>
       <h2>Trabajo realizado</h2>
       <p>Fotos o archivos del servicio (se registran contra el servicio real, bucket service-evidence).</p>
-      {evidence.length > 0 && <div className="uxp-evidence-grid">{evidence.map(item =>
-        <a key={item.storage_path} className="uxp-evidence-item" href={evidencePublicUrl(item.storage_path)} target="_blank" rel="noreferrer">
-          <span>📎</span><small>{item.storage_path.split('/').pop()}</small>
-        </a>)}</div>}
+      {evidence.length > 0 && <div className="uxp-evidence-grid">{evidence.map(item => {
+        const evidenceUrl = evidencePublicUrl(item.storage_path)
+        const isImage = /\.(jpe?g|png|webp|gif)$/i.test(item.storage_path)
+        return <a key={item.storage_path} className="uxp-evidence-item" href={evidenceUrl} target="_blank" rel="noreferrer">
+          {isImage ? <img src={evidenceUrl} alt="Evidencia del servicio" /> : <span>📎</span>}<small>{item.storage_path.split('/').pop()}</small>
+        </a>
+      })}</div>}
       <label className="uxp-upload">＋ Subir evidencia
         <input type="file" accept="image/*,application/pdf" disabled={busy} onChange={e => { void uploadFile(e.target.files?.[0]); e.target.value = '' }} />
       </label>

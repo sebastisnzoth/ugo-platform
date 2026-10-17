@@ -46,3 +46,15 @@
   .uxp-offer-actions{flex-direction:column-reverse}
   .uxp-offer-actions .ux-secondary,.uxp-offer-actions .ux-primary{width:100%}
 }
+
+/* Modern layer: disponibilidad y KYC */
+.uxp-availability{border-radius:13px;transition:transform .16s,background .18s,box-shadow .18s}
+.uxp-availability:hover:not(:disabled){transform:translateY(-1px)}
+.uxp-availability.uxp-online{background:linear-gradient(135deg,#e2f2ec,#d5eee2);box-shadow:0 8px 20px #0c7c6126}
+.uxp-availability.uxp-online .uxp-availability-dot{animation:uxp-pulse 2.2s ease-in-out infinite}
+@keyframes uxp-pulse{0%,100%{box-shadow:0 0 0 4px #18b1842e}50%{box-shadow:0 0 0 8px #18b1844d}}
+.uxp-availability:disabled{opacity:.55}
+.uxp-categories{border-radius:18px;transition:box-shadow .25s}
+.uxp-categories:hover{box-shadow:0 14px 36px #0c7c6112}
+.uxp-gate{border-radius:20px}
+@media(prefers-reduced-motion:reduce){.uxp-availability:hover,.uxp-availability.uxp-online .uxp-availability-dot{transform:none;animation:none}}

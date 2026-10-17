@@ -389,3 +389,23 @@ export async function submitProviderProfileToReview(userId: string, termsAccepte
     .eq('usuario_id', userId).in('estado_verificacion', ['registrado', 'rechazado'])
   if (error) throw new Error(messageOf(error, 'No pudimos enviar tu perfil a revisión.'))
 }
+
+// ---------- Ampliaciones: foto visible, documentos KYC accesibles, contraseña ----------
+
+export function providerPhotoUrl(path: string | null | undefined): string | null {
+  if (!path) return null
+  return supabase.storage.from('provider-public').getPublicUrl(path).data.publicUrl
+}
+
+/** URL firmada para ver un documento KYC (bucket privado provider-kyc). */
+export async function kycSignedUrl(storagePath: string): Promise<string> {
+  const { data, error } = await supabase.storage.from('provider-kyc').createSignedUrl(storagePath, 3600)
+  if (error || !data?.signedUrl) throw new Error(messageOf(error, 'No pudimos generar el enlace del documento.'))
+  return data.signedUrl
+}
+
+export async function changeProviderPassword(password: string): Promise<void> {
+  if (password.length < 8) throw new Error('La nueva contraseña debe tener al menos 8 caracteres.')
+  const { error } = await supabase.auth.updateUser({ password })
+  if (error) throw new Error(messageOf(error, 'No pudimos actualizar la contraseña.'))
+}

@@ -11,14 +11,17 @@ import {
   acceptOffer,
   advanceService,
   cancelService,
+  changeProviderPassword,
   ensureProviderProfile,
   formatDateTime,
   informarPagoDeuda,
+  kycSignedUrl,
   listKycDocuments,
   loadProviderCategories,
   loadProviderDemand,
   matchingGpsReady,
   money,
+  providerPhotoUrl,
   rejectOffer,
   saveProviderCategories,
   saveProviderProfile,
@@ -81,6 +84,9 @@ export default function ProviderExperience() {
   const [demand, setDemand] = useState<DemandRow[]>([])
   const [kycDocs, setKycDocs] = useState<KycDocument[]>([])
   const [terms, setTerms] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [repeatPassword, setRepeatPassword] = useState('')
+  const [passwordBusy, setPasswordBusy] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -110,6 +116,7 @@ export default function ProviderExperience() {
   const debtBlocked = openDebts.length >= 3
   const verified = profile?.estado_verificacion === 'verificado'
   const firstName = session?.user.email?.split('@')[0] || ''
+  const photoUrl = providerPhotoUrl(profile?.foto_perfil_path)
   const activeService = services.find(service => ['asignado', 'en_camino', 'llegado', 'en_progreso'].includes(service.estado))
     ?? services.find(service => PROVIDER_ACTIVE_STATES.includes(service.estado))
 
@@ -221,6 +228,27 @@ export default function ProviderExperience() {
       reload()
     }, 'Perfil enviado a revisión. Te avisamos cuando el equipo de UGO lo verifique.')
   }
+  async function openKycDoc(storagePath: string) {
+    try {
+      const url = await kycSignedUrl(storagePath)
+      window.open(url, '_blank', 'noopener')
+    } catch (error) {
+      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'No pudimos abrir el documento.' })
+    }
+  }
+  function submitPassword(event: FormEvent) {
+    event.preventDefault()
+    if (passwordBusy) return
+    if (newPassword !== repeatPassword) { setNotice({ type: 'error', text: 'Las contraseñas no coinciden.' }); return }
+    setPasswordBusy(true); setNotice(null)
+    changeProviderPassword(newPassword)
+      .then(() => {
+        setNotice({ type: 'ok', text: 'Contraseña actualizada correctamente.' })
+        setNewPassword(''); setRepeatPassword('')
+      })
+      .catch(error => setNotice({ type: 'error', text: error instanceof Error ? error.message : 'No pudimos actualizar la contraseña.' }))
+      .finally(() => setPasswordBusy(false))
+  }
 
   const released = payments.filter(p => p.estado === 'liberado' && p.metodo !== 'efectivo').reduce((n, p) => n + Number(p.ganancia_proveedor || 0), 0)
   const retained = payments.filter(p => p.estado === 'retenido').reduce((n, p) => n + Number(p.ganancia_proveedor || 0), 0)
@@ -245,7 +273,7 @@ export default function ProviderExperience() {
         <a className="ux-site-link" href="./">← Volver al sitio</a>
         <div className="ux-help">◉ <span><strong>¿Necesitás ayuda?</strong><small>Centro de soporte UGO</small></span></div>
         <button className="ux-person" onClick={() => go('profile')}>
-          <span className="ux-person-symbol">◉</span>
+          <span className="ux-person-symbol">{photoUrl ? <img src={photoUrl} alt="" /> : '◉'}</span>
           <span><strong>{firstName || 'Tu cuenta'}</strong><small>{session ? 'Proveedor UGO' : 'Ingresá a UGO'}</small></span>
         </button>
       </div>
@@ -256,7 +284,7 @@ export default function ProviderExperience() {
         <div className="ux-topcopy"><h1>{titles[view]}</h1><p>Tus trabajos y clientes, sin vueltas</p></div>
         <div className="ux-top-right">
           <span className="ux-location">⌖ Florianópolis</span>
-          {session ? <span className="ux-avatar" title={session.user.email}>◉</span> : <a className="ux-login-link" href="./">Ingresar</a>}
+          {session ? <span className="ux-avatar" title={session.user.email}>{photoUrl ? <img src={photoUrl} alt="" /> : '◉'}</span> : <a className="ux-login-link" href="./">Ingresar</a>}
         </div>
       </header>
       <main id="ux-content" className="ux-content">
@@ -524,6 +552,7 @@ export default function ProviderExperience() {
                   <h2>Onboarding / Verificación</h2>
                   <p>Subí tus documentos y enviá tu perfil a revisión. Estado actual: <strong>{profile?.estado_verificacion || 'sin perfil'}</strong>.</p>
                   <div className="uxp-photo-row">
+                    {photoUrl && <img className="uxp-photo-preview" src={photoUrl} alt="Tu foto de perfil" />}
                     <label className="uxp-upload">📷 Cambiar foto de perfil
                       <input type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={e => { photoUploadAction(e.target.files?.[0]); e.target.value = '' }} />
                     </label>
@@ -533,6 +562,8 @@ export default function ProviderExperience() {
                       <span>{tipo.label}</span>
                       {kycDocs.filter(doc => doc.tipo === tipo.value).map(doc =>
                         <span key={doc.id ?? doc.url_storage} className={'ux-chip ux-chip-' + orderTone(doc.estado)}>{doc.estado}</span>)}
+                      {kycDocs.filter(doc => doc.tipo === tipo.value && doc.url_storage).map(doc =>
+                        <button type="button" key={'ver-' + (doc.id ?? doc.url_storage)} className="uxp-ghost-btn" onClick={() => void openKycDoc(doc.url_storage!)}>Ver</button>)}
                       <label className="uxp-upload">Subir
                         <input type="file" accept="image/*,application/pdf" disabled={busy} onChange={e => { kycUploadAction(tipo.value, e.target.files?.[0]); e.target.value = '' }} />
                       </label>
@@ -546,6 +577,19 @@ export default function ProviderExperience() {
                   <button className="ux-primary" disabled={busy || (profile?.estado_verificacion !== 'registrado' && profile?.estado_verificacion !== 'rechazado' && profile != null)} onClick={submitReviewAction}>Enviar a revisión →</button>
                   {profile != null && profile.estado_verificacion !== 'registrado' && profile.estado_verificacion !== 'rechazado' &&
                     <p className="client-muted">Tu perfil está en estado “{profile.estado_verificacion}”. Solo podés reenviarlo desde “registrado” o “rechazado”.</p>}
+                </div>
+                <div className="uxp-categories">
+                  <h2>Seguridad</h2>
+                  <p>Cambiá tu contraseña de acceso.</p>
+                  <form className="client-profile-form" onSubmit={submitPassword}>
+                    <label>Nueva contraseña
+                      <input type="password" minLength={8} autoComplete="new-password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Mínimo 8 caracteres" />
+                    </label>
+                    <label>Repetir contraseña
+                      <input type="password" minLength={8} autoComplete="new-password" value={repeatPassword} onChange={e => setRepeatPassword(e.target.value)} />
+                    </label>
+                    <button className="client-secondary" disabled={passwordBusy || newPassword.length < 8}>{passwordBusy ? 'Guardando...' : 'Actualizar contraseña'}</button>
+                  </form>
                 </div>
                 <button className="client-secondary" onClick={async () => {
                   const { error } = await supabase.auth.signOut()

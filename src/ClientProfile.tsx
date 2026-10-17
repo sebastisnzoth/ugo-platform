@@ -69,6 +69,6 @@ export default function ClientProfile({ session }: { session: Session | null }) 
       </form>}
     {notice && <p role="status">{notice}</p>}
     <ClientSavedPlaces session={session} />
-    <button className="client-secondary" onClick={async()=>{const {error}=await supabase.auth.signOut();if(error)setNotice(error.message)}}>Cerrar sesión</button>
+    <button className="client-secondary" onClick={async()=>{const {error}=await supabase.auth.signOut();if(error){setNotice(error.message);return}window.location.assign('./')}}>Cerrar sesión</button>
   </section>
 }

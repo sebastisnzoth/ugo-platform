@@ -1,0 +1,48 @@
+/* Estilos propios de la app Proveedor (complementa client-zip-design.css) */
+
+/* Disponibilidad Online/Offline */
+.uxp-availability{display:flex;align-items:center;gap:10px;width:100%;border:0;border-radius:11px;background:#f2f4f2;color:#74817b;min-height:45px;padding:0 16px;font-size:12px;font-weight:700;text-align:left}
+.uxp-availability:hover:not(:disabled){background:#e9eeeb}
+.uxp-availability.uxp-online{background:var(--green-soft);color:var(--green)}
+.uxp-availability-dot{width:9px;height:9px;border-radius:50%;background:#b3bdb7;flex:none}
+.uxp-availability.uxp-online .uxp-availability-dot{background:#18b184;box-shadow:0 0 0 4px #18b18433}
+
+/* Banner de verificación / deuda */
+.uxp-gate{border-color:#f0dcb8;background:#fffaf0}
+.uxp-debt-alert{background:#fdeae6;color:#a63c26}
+
+/* Tarjetas de oportunidad */
+.uxp-offer-list{list-style:none;padding:0;display:grid;gap:14px;margin:0}
+.uxp-offer{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:13px}
+.uxp-offer-head{display:flex;align-items:center;gap:12px}
+.uxp-offer-title{display:grid;gap:4px;min-width:0;flex:1}
+.uxp-offer-title strong{font-size:14px}
+.uxp-offer-title small{font-size:11px;color:var(--muted)}
+.uxp-offer p{margin:0;font-size:12px;line-height:1.6;color:#63756c}
+.uxp-offer-meta{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.uxp-offer-meta strong{font-size:19px;letter-spacing:-.5px;color:var(--green)}
+.uxp-offer-meta small{font-size:10px;color:var(--muted)}
+.uxp-offer-actions{display:flex;gap:10px;justify-content:flex-end}
+.uxp-offer-actions .ux-secondary,.uxp-offer-actions .ux-primary{min-width:130px}
+
+/* Lifecycle del servicio activo */
+.uxp-steps{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.uxp-steps span{border-radius:20px;background:#e9eeeb;padding:8px 12px;color:#7d8d83;font-size:10px;font-weight:700}
+.uxp-steps span.done{background:#d5e9df;color:#075a48}
+.uxp-steps span.current{background:var(--green-soft);color:var(--green);font-weight:800;box-shadow:0 0 0 2px #0c7c6122}
+
+/* Varios */
+.uxp-active-preview,.uxp-offers-preview{margin-top:20px}
+.uxp-payment-strip{margin-top:16px}
+.uxp-alert-error{background:#fdeae6;color:#a63c26}
+.uxp-alert-ok{background:#e2f2ec;color:#075a48}
+.uxp-categories{margin:26px 0 8px;padding:20px;border:1px solid var(--line);border-radius:16px;background:#fbfdfc;display:grid;gap:12px}
+.uxp-categories h2{margin:0;font-size:17px}
+.uxp-categories p{margin:0;font-size:12px;color:var(--muted)}
+.uxp-primary-cat{display:grid;gap:7px;font-size:12px;font-weight:700;max-width:320px}
+.uxp-primary-cat select{padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;font-size:13px}
+.uxugo .client-profile-form textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;font-size:13px;resize:vertical}
+@media(max-width:620px){
+  .uxp-offer-actions{flex-direction:column-reverse}
+  .uxp-offer-actions .ux-secondary,.uxp-offer-actions .ux-primary{width:100%}
+}
